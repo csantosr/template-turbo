@@ -1,6 +1,6 @@
 import {
+  type db as _db,
   activityLogs,
-  db as _db,
   rolePermissions,
   roles,
   userPermissions,
@@ -9,15 +9,15 @@ import {
 } from "@repo/db";
 
 type Db = typeof _db;
+
 import { ALL_PERMISSIONS } from "@repo/validators";
 import { TRPCError } from "@trpc/server";
 import { and, eq } from "drizzle-orm";
 import { z } from "zod";
-import { protectedProcedure, requirePermission, router } from "../trpc";
 import { getUserEffectivePermissions } from "../rbac";
+import { protectedProcedure, requirePermission, router } from "../trpc";
 
 export const rbacRouter = router({
-  /** List all roles with their permissions. Any authenticated user can read. */
   listRoles: protectedProcedure.query(async ({ ctx }) => {
     const allRoles = await ctx.db.query.roles.findMany({
       orderBy: (r, { asc }) => asc(r.name),
@@ -32,11 +32,14 @@ export const rbacRouter = router({
     }));
   }),
 
-  /** Create a new role. */
   createRole: requirePermission("roles", "create")
     .input(
       z.object({
-        id: z.string().min(1).max(50).regex(/^[a-z0-9_-]+$/),
+        id: z
+          .string()
+          .min(1)
+          .max(50)
+          .regex(/^[a-z0-9_-]+$/),
         name: z.string().min(1).max(100),
         description: z.string().max(500).optional(),
       }),
@@ -70,14 +73,11 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
-  /** Replace the full permission set for a role. */
   updateRolePermissions: requirePermission("roles", "update")
     .input(
       z.object({
         roleId: z.string(),
-        permissions: z.array(
-          z.object({ resource: z.string(), action: z.string() }),
-        ),
+        permissions: z.array(z.object({ resource: z.string(), action: z.string() })),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -92,7 +92,6 @@ export const rbacRouter = router({
         });
       }
 
-      // Validate that all provided permissions exist in PERMISSIONS registry
       const validKeys = new Set(ALL_PERMISSIONS.map((p) => `${p.resource}:${p.action}`));
       for (const p of input.permissions) {
         if (!validKeys.has(`${p.resource}:${p.action}`)) {
@@ -103,7 +102,6 @@ export const rbacRouter = router({
         }
       }
 
-      // Replace permissions atomically
       await ctx.db.delete(rolePermissions).where(eq(rolePermissions.roleId, input.roleId));
       if (input.permissions.length > 0) {
         await ctx.db.insert(rolePermissions).values(
@@ -129,7 +127,6 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
-  /** Delete a non-system role. */
   deleteRole: requirePermission("roles", "delete")
     .input(z.object({ roleId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -155,7 +152,6 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
-  /** Assign a role to a user. */
   assignRole: requirePermission("roles", "assign")
     .input(z.object({ userId: z.string(), roleId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -166,12 +162,8 @@ export const rbacRouter = router({
       if (!targetUser) throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
       if (!role) throw new TRPCError({ code: "NOT_FOUND", message: "Role not found." });
 
-      // Upsert — silently succeed if already assigned
       const existing = await ctx.db.query.userRoles.findFirst({
-        where: and(
-          eq(userRoles.userId, input.userId),
-          eq(userRoles.roleId, input.roleId),
-        ),
+        where: and(eq(userRoles.userId, input.userId), eq(userRoles.roleId, input.roleId)),
       });
       if (!existing) {
         await ctx.db.insert(userRoles).values({
@@ -183,7 +175,6 @@ export const rbacRouter = router({
         });
       }
 
-      // Sync comma-sep role field so Better Auth admin operations still work
       await syncUserRoleField(ctx.db, input.userId);
 
       await ctx.db.insert(activityLogs).values({
@@ -198,7 +189,6 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
-  /** Remove a role from a user. */
   revokeRole: requirePermission("roles", "assign")
     .input(z.object({ userId: z.string(), roleId: z.string() }))
     .mutation(async ({ ctx, input }) => {
@@ -209,9 +199,7 @@ export const rbacRouter = router({
 
       await ctx.db
         .delete(userRoles)
-        .where(
-          and(eq(userRoles.userId, input.userId), eq(userRoles.roleId, input.roleId)),
-        );
+        .where(and(eq(userRoles.userId, input.userId), eq(userRoles.roleId, input.roleId)));
 
       await syncUserRoleField(ctx.db, input.userId);
 
@@ -227,7 +215,6 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
-  /** Grant or deny a specific permission directly on a user (overrides role). */
   setUserPermission: requirePermission("roles", "update")
     .input(
       z.object({
@@ -251,7 +238,6 @@ export const rbacRouter = router({
         });
       }
 
-      // Upsert
       const existing = await ctx.db.query.userPermissions.findFirst({
         where: and(
           eq(userPermissions.userId, input.userId),
@@ -289,7 +275,6 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
-  /** Remove a per-user permission override entirely (falls back to role). */
   removeUserPermission: requirePermission("roles", "update")
     .input(
       z.object({
@@ -311,14 +296,12 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
-  /** Get all effective permissions for a user (resolved from roles + overrides). */
   getUserEffectivePermissions: requirePermission("users", "read")
     .input(z.object({ userId: z.string() }))
     .query(async ({ input }) => {
       return getUserEffectivePermissions(input.userId);
     }),
 
-  /** Get a user's roles and per-user permission overrides. */
   getUserRbac: requirePermission("users", "read")
     .input(z.object({ userId: z.string() }))
     .query(async ({ ctx, input }) => {
@@ -331,7 +314,6 @@ export const rbacRouter = router({
         }),
       ]);
 
-      // Attach role metadata
       const roleIds = assignedUserRoles.map((ur) => ur.roleId);
       const roleRecords =
         roleIds.length > 0
@@ -350,31 +332,23 @@ export const rbacRouter = router({
       };
     }),
 
-  /** List every permission in the registry (for building UIs). */
   listAvailablePermissions: protectedProcedure.query(() => {
     return ALL_PERMISSIONS;
   }),
 
-  /**
-   * Returns the current user's effective permissions as a flat string array
-   * ("resource:action"). No special permission required — self-service.
-   * Use this in client components to decide which buttons to render.
-   */
   myPermissions: protectedProcedure.query(async ({ ctx }) => {
     const perms = await getUserEffectivePermissions(ctx.session.user.id);
     return perms.map((p) => `${p.resource}:${p.action}`);
   }),
 });
 
-// ---------------------------------------------------------------------------
-// Internal helper
-// ---------------------------------------------------------------------------
-
-/** Keep user.role (comma-sep) in sync with user_roles table. */
 async function syncUserRoleField(db: Db, userId: string) {
   const assigned = await db.query.userRoles.findMany({
     where: eq(userRoles.userId, userId),
   });
   const roleString = assigned.map((r) => r.roleId).join(",") || "member";
-  await db.update(users).set({ role: roleString, updatedAt: new Date() }).where(eq(users.id, userId));
+  await db
+    .update(users)
+    .set({ role: roleString, updatedAt: new Date() })
+    .where(eq(users.id, userId));
 }

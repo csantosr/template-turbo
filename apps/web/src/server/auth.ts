@@ -77,10 +77,7 @@ export const auth = betterAuth({
               action: "LOGIN",
               status: "success",
             });
-          } catch {
-            // non-critical — don't fail login if logging fails
-          }
-        },
+          } catch { /* non-critical */ }
       },
     },
   },

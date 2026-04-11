@@ -1,7 +1,7 @@
-import { getSession } from "@/auth";
 import { ArrowRight, CheckCircle, XCircle } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { getSession } from "@/auth";
 
 const STATS = [
   {
@@ -100,7 +100,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-8 p-6 md:p-8">
-      {/* Welcome */}
       <div>
         <p className="mb-1 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Welcome back
@@ -110,7 +109,6 @@ export default async function DashboardPage() {
         </h1>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 gap-px border border-border bg-border sm:grid-cols-2 lg:grid-cols-4">
         {STATS.map((s) => (
           <div key={s.label} className="flex flex-col gap-2 bg-background p-6">
@@ -120,9 +118,7 @@ export default async function DashboardPage() {
             <span className="font-mono text-3xl font-bold">{s.value}</span>
             <span
               className={`font-mono text-sm ${
-                s.up
-                  ? "text-green-800 dark:text-green-400"
-                  : "text-muted-foreground"
+                s.up ? "text-green-800 dark:text-green-400" : "text-muted-foreground"
               }`}
             >
               {s.change}
@@ -131,9 +127,7 @@ export default async function DashboardPage() {
         ))}
       </div>
 
-      {/* Two-column: recent users + activity */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
-        {/* Recent users */}
         <div>
           <div className="mb-3 flex items-center justify-between">
             <span className="font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
@@ -143,7 +137,9 @@ export default async function DashboardPage() {
               href="/users"
               className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
             >
-              <span className="flex items-center gap-1">View all <ArrowRight weight="bold" size={14} /></span>
+              <span className="flex items-center gap-1">
+                View all <ArrowRight weight="bold" size={14} />
+              </span>
             </Link>
           </div>
           <div className="border border-border">
@@ -163,15 +159,10 @@ export default async function DashboardPage() {
               </thead>
               <tbody>
                 {RECENT_USERS.map((u) => (
-                  <tr
-                    key={u.email}
-                    className="border-b border-border last:border-0"
-                  >
+                  <tr key={u.email} className="border-b border-border last:border-0">
                     <td className="px-4 py-3">
                       <p className="font-mono text-base font-bold">{u.name}</p>
-                      <p className="font-mono text-sm text-muted-foreground">
-                        {u.email}
-                      </p>
+                      <p className="font-mono text-sm text-muted-foreground">{u.email}</p>
                     </td>
                     <td className="px-4 py-3 font-mono text-sm uppercase tracking-widest text-muted-foreground">
                       {u.role}
@@ -186,7 +177,6 @@ export default async function DashboardPage() {
           </div>
         </div>
 
-        {/* Recent activity */}
         <div>
           <div className="mb-3 flex items-center justify-between">
             <span className="font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
@@ -196,7 +186,9 @@ export default async function DashboardPage() {
               href="/activity"
               className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
             >
-              <span className="flex items-center gap-1">View all <ArrowRight weight="bold" size={14} /></span>
+              <span className="flex items-center gap-1">
+                View all <ArrowRight weight="bold" size={14} />
+              </span>
             </Link>
           </div>
           <div className="border border-border">
@@ -205,10 +197,14 @@ export default async function DashboardPage() {
                 key={i}
                 className="flex items-start gap-3 border-b border-border p-4 last:border-0"
               >
-                <span className={`mt-0.5 shrink-0 ${a.ok ? "text-green-800 dark:text-green-400" : "text-destructive"}`}>
-                  {a.ok
-                    ? <CheckCircle weight="fill" size={16} />
-                    : <XCircle weight="fill" size={16} />}
+                <span
+                  className={`mt-0.5 shrink-0 ${a.ok ? "text-green-800 dark:text-green-400" : "text-destructive"}`}
+                >
+                  {a.ok ? (
+                    <CheckCircle weight="fill" size={16} />
+                  ) : (
+                    <XCircle weight="fill" size={16} />
+                  )}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="font-mono text-sm font-bold uppercase tracking-widest">
@@ -218,9 +214,7 @@ export default async function DashboardPage() {
                     {a.user} — {a.detail}
                   </p>
                 </div>
-                <span className="shrink-0 font-mono text-sm text-muted-foreground">
-                  {a.time}
-                </span>
+                <span className="shrink-0 font-mono text-sm text-muted-foreground">{a.time}</span>
               </div>
             ))}
           </div>

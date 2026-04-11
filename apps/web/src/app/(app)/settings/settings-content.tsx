@@ -1,7 +1,7 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
 import { ArrowRight } from "@phosphor-icons/react";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { trpc } from "@/trpc/client";
 
 export function SettingsContent() {
@@ -19,7 +19,6 @@ export function SettingsContent() {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* Profile */}
       <section>
         <p className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Profile
@@ -44,24 +43,19 @@ export function SettingsContent() {
               <dt className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
                 User ID
               </dt>
-              <dd className="break-all font-mono text-sm text-muted-foreground">
-                {user.id}
-              </dd>
+              <dd className="break-all font-mono text-sm text-muted-foreground">{user.id}</dd>
             </div>
             <div className="border-t border-border" />
             <div className="flex flex-col gap-1">
               <dt className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
                 Email Verified
               </dt>
-              <dd className="font-mono text-base">
-                {user.emailVerified ? "YES" : "NO"}
-              </dd>
+              <dd className="font-mono text-base">{user.emailVerified ? "YES" : "NO"}</dd>
             </div>
           </dl>
         </div>
       </section>
 
-      {/* Security */}
       <section>
         <p className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Security
@@ -69,35 +63,30 @@ export function SettingsContent() {
         <div className="max-w-md border-2 border-border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-mono text-base font-bold uppercase tracking-widest">
-                Password
-              </p>
-              <p className="font-mono text-sm text-muted-foreground">
-                Last changed: never
-              </p>
+              <p className="font-mono text-base font-bold uppercase tracking-widest">Password</p>
+              <p className="font-mono text-sm text-muted-foreground">Last changed: never</p>
             </div>
             <button className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground">
-              <span className="flex items-center gap-1">Change <ArrowRight weight="bold" size={14} /></span>
+              <span className="flex items-center gap-1">
+                Change <ArrowRight weight="bold" size={14} />
+              </span>
             </button>
           </div>
           <div className="my-4 border-t border-border" />
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-mono text-base font-bold uppercase tracking-widest">
-                Sessions
-              </p>
-              <p className="font-mono text-sm text-muted-foreground">
-                1 active session
-              </p>
+              <p className="font-mono text-base font-bold uppercase tracking-widest">Sessions</p>
+              <p className="font-mono text-sm text-muted-foreground">1 active session</p>
             </div>
             <button className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground">
-              <span className="flex items-center gap-1">Revoke all <ArrowRight weight="bold" size={14} /></span>
+              <span className="flex items-center gap-1">
+                Revoke all <ArrowRight weight="bold" size={14} />
+              </span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* Appearance */}
       <section>
         <p className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Appearance
@@ -105,9 +94,7 @@ export function SettingsContent() {
         <div className="max-w-md border-2 border-border p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="font-mono text-base font-bold uppercase tracking-widest">
-                Theme
-              </p>
+              <p className="font-mono text-base font-bold uppercase tracking-widest">Theme</p>
               <p className="font-mono text-sm text-muted-foreground">
                 Toggle between light and dark mode.
               </p>
@@ -117,7 +104,6 @@ export function SettingsContent() {
         </div>
       </section>
 
-      {/* Danger zone */}
       <section>
         <p className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-destructive">
           Danger Zone
@@ -133,7 +119,9 @@ export function SettingsContent() {
               </p>
             </div>
             <button className="font-mono text-sm uppercase tracking-widest text-destructive hover:underline">
-              <span className="flex items-center gap-1">Delete <ArrowRight weight="bold" size={14} /></span>
+              <span className="flex items-center gap-1">
+                Delete <ArrowRight weight="bold" size={14} />
+              </span>
             </button>
           </div>
         </div>

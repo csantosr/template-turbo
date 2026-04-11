@@ -1,9 +1,9 @@
 "use client";
 
 import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
-import { trpc } from "@/trpc/client";
 import { useState } from "react";
-import { ActivityFilters, type ActivityFilter } from "./_components/activity-filters";
+import { trpc } from "@/trpc/client";
+import { type ActivityFilter, ActivityFilters } from "./_components/activity-filters";
 
 const PAGE_SIZE = 20;
 
@@ -34,7 +34,6 @@ export default function ActivityPage() {
     <div className="flex flex-col gap-6 p-6 md:p-8">
       <ActivityFilters value={filter} onChange={handleFilter} />
 
-      {/* Table */}
       <Table>
         <TableHeader>
           <TableRow>
@@ -63,8 +62,10 @@ export default function ActivityPage() {
               <TableRow key={a.id}>
                 <TableCell className="text-sm text-muted-foreground">
                   {new Date(a.createdAt).toLocaleString("en-US", {
-                    month: "short", day: "numeric",
-                    hour: "2-digit", minute: "2-digit",
+                    month: "short",
+                    day: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
                   })}
                 </TableCell>
                 <TableCell className="text-sm">{a.userEmail ?? "—"}</TableCell>
@@ -73,9 +74,7 @@ export default function ActivityPage() {
                     {a.action}
                   </span>
                 </TableCell>
-                <TableCell className="text-sm text-muted-foreground">
-                  {a.detail ?? "—"}
-                </TableCell>
+                <TableCell className="text-sm text-muted-foreground">{a.detail ?? "—"}</TableCell>
                 <TableCell>
                   <Badge variant={a.status === "success" ? "success" : "destructive"}>
                     {a.status}
@@ -87,7 +86,6 @@ export default function ActivityPage() {
         </TableBody>
       </Table>
 
-      {/* Pagination + count */}
       <div className="flex items-center justify-between">
         <p className="font-mono text-sm text-muted-foreground">
           {total} event{total !== 1 ? "s" : ""} total

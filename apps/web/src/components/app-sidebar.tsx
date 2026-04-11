@@ -1,7 +1,6 @@
 "use client";
 
-import { signOut } from "@/lib/auth-client";
-import { Button } from "@repo/ui";
+import type { Icon } from "@phosphor-icons/react";
 import {
   CaretDoubleLeft,
   CaretDoubleRight,
@@ -13,17 +12,18 @@ import {
   SquaresFour,
   Users,
 } from "@phosphor-icons/react";
-import type { Icon } from "@phosphor-icons/react";
+import { Button } from "@repo/ui";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { signOut } from "@/lib/auth-client";
 
 const NAV: { href: string; label: string; icon: Icon; permission: string | null }[] = [
   { href: "/dashboard", label: "DASHBOARD", icon: SquaresFour, permission: null },
-  { href: "/users",     label: "USERS",     icon: Users,       permission: "users:read" },
-  { href: "/roles",     label: "ROLES",     icon: ShieldCheck, permission: "roles:read" },
-  { href: "/activity",  label: "ACTIVITY",  icon: Pulse,       permission: "activity:read" },
-  { href: "/settings",  label: "SETTINGS",  icon: Gear,        permission: null },
+  { href: "/users", label: "USERS", icon: Users, permission: "users:read" },
+  { href: "/roles", label: "ROLES", icon: ShieldCheck, permission: "roles:read" },
+  { href: "/activity", label: "ACTIVITY", icon: Pulse, permission: "activity:read" },
+  { href: "/settings", label: "SETTINGS", icon: Gear, permission: null },
 ];
 
 interface AppSidebarProps {
@@ -67,7 +67,6 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
         isCollapsed ? "w-14" : "w-56"
       }`}
     >
-      {/* Brand + toggle */}
       <div
         className={`flex h-14 items-center border-b border-border ${
           isCollapsed ? "justify-center px-3" : "justify-between px-4"
@@ -103,33 +102,31 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
         )}
       </div>
 
-      {/* Nav */}
       <nav className="flex flex-1 flex-col gap-0.5 p-2">
-        {NAV.filter((item) => item.permission === null || permSet.has(item.permission)).map((item) => {
-          const isActive =
-            pathname === item.href ||
-            pathname.startsWith(`${item.href}/`);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={isCollapsed ? item.label : undefined}
-              className={`flex items-center border-l-2 py-2 font-mono text-sm uppercase tracking-widest transition-none ${
-                isCollapsed ? "justify-center px-2" : "gap-2.5 px-3"
-              } ${
-                isActive
-                  ? "border-foreground text-foreground"
-                  : "border-transparent text-muted-foreground hover:border-muted-foreground hover:text-foreground"
-              }`}
-            >
-              <item.icon weight="bold" size={16} />
-              {!isCollapsed && item.label}
-            </Link>
-          );
-        })}
+        {NAV.filter((item) => item.permission === null || permSet.has(item.permission)).map(
+          (item) => {
+            const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                title={isCollapsed ? item.label : undefined}
+                className={`flex items-center border-l-2 py-2 font-mono text-sm uppercase tracking-widest transition-none ${
+                  isCollapsed ? "justify-center px-2" : "gap-2.5 px-3"
+                } ${
+                  isActive
+                    ? "border-foreground text-foreground"
+                    : "border-transparent text-muted-foreground hover:border-muted-foreground hover:text-foreground"
+                }`}
+              >
+                <item.icon weight="bold" size={16} />
+                {!isCollapsed && item.label}
+              </Link>
+            );
+          },
+        )}
       </nav>
 
-      {/* Bottom: user info + sign out */}
       <div className="border-t border-border p-3">
         {!isCollapsed && (
           <div className="mb-3">

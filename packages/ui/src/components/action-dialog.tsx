@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useContext, useState } from "react";
 import type { ReactNode } from "react";
+import { createContext, useContext, useState } from "react";
 import { Button } from "./button";
 import {
   Dialog,
@@ -13,15 +13,11 @@ import {
   DialogTrigger,
 } from "./dialog";
 
-// ── Close context ─────────────────────────────────────────────────────────────
-
 const DialogCloseCtx = createContext<() => void>(() => {});
 
 export function useDialogClose() {
   return useContext(DialogCloseCtx);
 }
-
-// ── ActionDialog ──────────────────────────────────────────────────────────────
 
 export interface ActionDialogProps {
   trigger: ReactNode;
@@ -62,8 +58,6 @@ export function ActionDialog({
     </DialogCloseCtx.Provider>
   );
 }
-
-// ── ConfirmDialog ─────────────────────────────────────────────────────────────
 
 interface ConfirmFooterProps {
   onConfirm: (close: () => void) => void;

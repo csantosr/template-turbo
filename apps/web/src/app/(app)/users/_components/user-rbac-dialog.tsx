@@ -1,7 +1,7 @@
 "use client";
 
-import { ActionDialog, Badge, Button } from "@repo/ui";
 import { ShieldCheck, X } from "@phosphor-icons/react";
+import { ActionDialog, Badge, Button } from "@repo/ui";
 import { useState } from "react";
 import { trpc } from "@/trpc/client";
 
@@ -75,11 +75,12 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
       }
       title="Roles & Permissions"
       description={`${userName} · ${userEmail}`}
-      onOpenChange={(open) => { if (!open) setError(null); }}
+      onOpenChange={(open) => {
+        if (!open) setError(null);
+      }}
     >
       {({ close: _close }) => (
         <div className="flex flex-col gap-6">
-          {/* ── Assigned Roles ── */}
           <section>
             <p className="mb-2 font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Assigned Roles
@@ -89,7 +90,9 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
             ) : (
               <div className="flex flex-wrap items-center gap-2">
                 {(data?.roles ?? []).length === 0 && (
-                  <span className="font-mono text-sm text-muted-foreground">No roles assigned.</span>
+                  <span className="font-mono text-sm text-muted-foreground">
+                    No roles assigned.
+                  </span>
                 )}
                 {(data?.roles ?? []).map((ur) => (
                   <span
@@ -109,7 +112,6 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
                 ))}
               </div>
             )}
-            {/* Add role */}
             {availableRolesToAdd.length > 0 && (
               <div className="mt-3 flex items-center gap-2">
                 <select
@@ -119,7 +121,9 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
                 >
                   <option value="">— Add role —</option>
                   {availableRolesToAdd.map((r) => (
-                    <option key={r.id} value={r.id}>{r.name} ({r.id})</option>
+                    <option key={r.id} value={r.id}>
+                      {r.name} ({r.id})
+                    </option>
                   ))}
                 </select>
                 <Button
@@ -134,7 +138,6 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
             )}
           </section>
 
-          {/* ── Permission Overrides ── */}
           <section>
             <p className="mb-1 font-mono text-xs font-bold uppercase tracking-widest text-muted-foreground">
               Permission Overrides
@@ -149,7 +152,10 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
             ) : (
               <div className="flex flex-col gap-1.5">
                 {(data?.overrides ?? []).map((o) => (
-                  <div key={o.id} className="flex items-center justify-between border border-border px-3 py-1.5">
+                  <div
+                    key={o.id}
+                    className="flex items-center justify-between border border-border px-3 py-1.5"
+                  >
                     <span className="font-mono text-sm">
                       {o.resource}:{o.action}
                     </span>
@@ -158,7 +164,13 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
                         {o.granted ? "GRANTED" : "DENIED"}
                       </Badge>
                       <button
-                        onClick={() => removePermission.mutate({ userId, resource: o.resource, action: o.action })}
+                        onClick={() =>
+                          removePermission.mutate({
+                            userId,
+                            resource: o.resource,
+                            action: o.action,
+                          })
+                        }
                         disabled={removePermission.isPending}
                         className="font-mono text-xs uppercase tracking-widest text-muted-foreground hover:text-destructive"
                       >
@@ -170,17 +182,21 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
               </div>
             )}
 
-            {/* Add override */}
             <div className="mt-3 flex flex-col gap-2">
               <div className="flex gap-2">
                 <select
                   value={overrideResource}
-                  onChange={(e) => { setOverrideResource(e.target.value); setOverrideAction(""); }}
+                  onChange={(e) => {
+                    setOverrideResource(e.target.value);
+                    setOverrideAction("");
+                  }}
                   className="flex-1 border-2 border-border bg-background px-2 py-1.5 font-mono text-sm uppercase tracking-widest focus:outline-none"
                 >
                   <option value="">— Resource —</option>
                   {availableResources.map((r) => (
-                    <option key={r} value={r}>{r}</option>
+                    <option key={r} value={r}>
+                      {r}
+                    </option>
                   ))}
                 </select>
                 <select
@@ -191,7 +207,9 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
                 >
                   <option value="">— Action —</option>
                   {availableActions.map((a) => (
-                    <option key={a} value={a}>{a}</option>
+                    <option key={a} value={a}>
+                      {a}
+                    </option>
                   ))}
                 </select>
               </div>

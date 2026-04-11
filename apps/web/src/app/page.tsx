@@ -134,7 +134,7 @@ const FAQ = [
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col">
-      {/* ── Hero ── */}
+
       <section className="flex min-h-screen flex-col justify-center border-b border-border px-6 py-24 md:px-16">
         <p className="mb-6 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Full-stack monorepo starter
@@ -169,10 +169,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Sticky nav ── */}
+
       <LandingNav />
 
-      {/* ── Product ── */}
+
       <section
         id="product"
         className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16"
@@ -209,7 +209,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Pricing ── */}
+
       <section
         id="pricing"
         className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16"
@@ -295,7 +295,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── FAQ ── */}
+
       <section
         id="faq"
         className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16"
@@ -329,7 +329,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── Footer ── */}
+
       <footer className="flex flex-col gap-6 border-t border-border px-6 py-10 md:flex-row md:items-center md:justify-between md:px-16">
         <div className="flex flex-col gap-1">
           <span className="font-mono text-base font-bold uppercase tracking-widest">

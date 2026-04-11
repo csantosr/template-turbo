@@ -17,10 +17,11 @@ export default function RolesPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-mono text-xl font-bold uppercase tracking-widest">Roles &amp; Permissions</h1>
+          <h1 className="font-mono text-xl font-bold uppercase tracking-widest">
+            Roles &amp; Permissions
+          </h1>
           <p className="mt-1 font-mono text-sm text-muted-foreground">
             Manage roles and the permissions they grant.
           </p>
@@ -28,7 +29,6 @@ export default function RolesPage() {
         {canCreate && <CreateRoleDialog />}
       </div>
 
-      {/* Table */}
       <Table>
         <TableHeader>
           <TableRow>
@@ -50,14 +50,17 @@ export default function RolesPage() {
           ) : !roles || roles.length === 0 ? (
             <TableRow>
               <TableCell className="py-12 text-center text-muted-foreground" colSpan={6}>
-                No roles found. Run <code className="font-mono">pnpm db:seed:rbac</code> to seed defaults.
+                No roles found. Run <code className="font-mono">pnpm db:seed:rbac</code> to seed
+                defaults.
               </TableCell>
             </TableRow>
           ) : (
             roles.map((role) => (
               <TableRow key={role.id}>
                 <TableCell>
-                  <span className="font-mono text-sm font-bold uppercase tracking-widest">{role.id}</span>
+                  <span className="font-mono text-sm font-bold uppercase tracking-widest">
+                    {role.id}
+                  </span>
                 </TableCell>
                 <TableCell className="font-bold">{role.name}</TableCell>
                 <TableCell className="max-w-xs text-sm text-muted-foreground">

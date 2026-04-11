@@ -1,9 +1,9 @@
-import { auth } from "@/server/auth";
-import { checkPermission } from "@/server/rbac";
 import { db } from "@repo/db";
 import type { Action, Resource } from "@repo/validators";
-import { TRPCError, initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import type { FetchCreateContextFnOptions } from "@trpc/server/adapters/fetch";
+import { auth } from "@/server/auth";
+import { checkPermission } from "@/server/rbac";
 
 export async function createContext({ req }: FetchCreateContextFnOptions) {
   const session = await auth.api.getSession({ headers: req.headers });
@@ -21,16 +21,7 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
   return next({ ctx: { ...ctx, session: ctx.session } });
 });
 
-/**
- * Middleware factory that guards a procedure behind a specific permission.
- *
- * Usage:
- *   requirePermission("users", "delete").input(z.object({...})).mutation(...)
- */
-export const requirePermission = <R extends Resource>(
-  resource: R,
-  action: Action<R>,
-) =>
+export const requirePermission = <R extends Resource>(resource: R, action: Action<R>) =>
   t.procedure.use(async ({ ctx, next }) => {
     if (!ctx.session) throw new TRPCError({ code: "UNAUTHORIZED" });
     const allowed = await checkPermission(ctx.session.user.id, resource, action);

@@ -1,11 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: [
-    "./src/**/*.{ts,tsx}",
-    // Include consuming apps — override in each app's tailwind config
-    "../../apps/*/src/**/*.{ts,tsx}",
-  ],
+  content: ["./src/**/*.{ts,tsx}", "../../apps/*/src/**/*.{ts,tsx}"],
   theme: {
     extend: {
       colors: {

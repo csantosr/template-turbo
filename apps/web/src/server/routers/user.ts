@@ -53,7 +53,6 @@ export const userRouter = router({
         ctx.db.select({ total: count() }).from(users).where(where),
       ]);
 
-      // Attach actual roles from user_roles join (source of truth)
       const userIds = rows.map((u) => u.id);
       const assignedRoles =
         userIds.length > 0
@@ -92,13 +91,12 @@ export const userRouter = router({
         });
       }
 
-      // Store token — identifier=email, value=token — so we can validate both on accept
       const token = crypto.randomUUID();
       await ctx.db.insert(verifications).values({
         id: crypto.randomUUID(),
         identifier: email,
         value: token,
-        expiresAt: new Date(Date.now() + 86_400_000), // 24 hours
+        expiresAt: new Date(Date.now() + 86_400_000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -163,10 +161,8 @@ export const userRouter = router({
         });
       }
 
-      // The invite token itself confirms email ownership — mark as verified immediately
       await ctx.db.update(users).set({ emailVerified: true }).where(eq(users.email, email));
 
-      // Consume token
       await ctx.db.delete(verifications).where(eq(verifications.id, verification.id));
 
       return { success: true };
@@ -271,13 +267,12 @@ export const userRouter = router({
         throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
       }
 
-      // Generate reset token manually (same as invite flow)
       const token = crypto.randomUUID();
       await ctx.db.insert(verifications).values({
         id: crypto.randomUUID(),
         identifier: user.email,
         value: token,
-        expiresAt: new Date(Date.now() + 3_600_000), // 1 hour
+        expiresAt: new Date(Date.now() + 3_600_000),
         createdAt: new Date(),
         updatedAt: new Date(),
       });
@@ -307,7 +302,7 @@ export const userRouter = router({
       z.object({
         userId: z.string(),
         reason: z.string().max(500).optional(),
-        expiresIn: z.number().int().positive().optional(), // seconds
+        expiresIn: z.number().int().positive().optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

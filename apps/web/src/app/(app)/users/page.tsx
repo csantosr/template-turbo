@@ -86,7 +86,6 @@ export default function UsersPage() {
 
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8">
-      {/* Toolbar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Input
           placeholder="Search by name or email..."
@@ -97,7 +96,6 @@ export default function UsersPage() {
         {canInvite && <InviteUserDialog />}
       </div>
 
-      {/* Table */}
       <Table>
         <TableHeader>
           <TableRow>
@@ -213,7 +211,6 @@ export default function UsersPage() {
         </TableBody>
       </Table>
 
-      {/* Pagination */}
       <div className="flex items-center justify-between">
         <p className="font-mono text-sm text-muted-foreground">
           {total} user{total !== 1 ? "s" : ""} total
@@ -243,7 +240,6 @@ export default function UsersPage() {
         )}
       </div>
 
-      {/* Deletions Section */}
       {canReadDeletions && (
         <div className="flex flex-col gap-4 border-t-2 border-border pt-6">
           <button
@@ -294,10 +290,10 @@ export default function UsersPage() {
                         <TableCell className="text-sm text-muted-foreground">
                           {user.deletedAt
                             ? new Date(user.deletedAt).toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              year: "numeric",
-                            })
+                                month: "short",
+                                day: "numeric",
+                                year: "numeric",
+                              })
                             : "—"}
                         </TableCell>
                         <TableCell className="text-sm text-muted-foreground">
