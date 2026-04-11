@@ -2,19 +2,27 @@
   "name": "template-turbo",
   "private": true,
   "scripts": {
-    "build": "turbo run build",
-    "dev": "turbo run dev",
-    "lint": "turbo run lint",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-    "check-types": "turbo run check-types"
+    "build": "turbo build",
+    "dev": "docker compose up -d && turbo dev",
+    "lint": "turbo lint",
+    "format": "biome format --write .",
+    "db:generate": "turbo db:generate",
+    "db:migrate": "turbo db:migrate",
+    "db:studio": "turbo db:studio",
+    "email:dev": "turbo email:dev"
   },
   "devDependencies": {
-    "prettier": "^3.7.4",
+    "@biomejs/biome": "^2.4.10",
     "turbo": "^2.9.5",
-    "typescript": "5.9.2"
+    "typescript": "^6.0.2"
   },
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
+  },
+  "pnpm": {
+    "overrides": {
+      "esbuild": "^0.23.0"
+    }
   }
 }
