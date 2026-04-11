@@ -1,16 +1,15 @@
-import { db } from "@repo/db";
 import * as schema from "@repo/db";
-import { activityLogs, users } from "@repo/db";
-import { ResetPasswordEmail, VerifyEmailEmail, sendEmail } from "@repo/email";
+import { activityLogs, db, users } from "@repo/db";
+import { ResetPasswordEmail, sendEmail, VerifyEmailEmail } from "@repo/email";
 import { betterAuth } from "better-auth";
-import { APIError, createAuthMiddleware } from "better-auth/api";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { APIError, createAuthMiddleware } from "better-auth/api";
 import { nextCookies } from "better-auth/next-js";
 import { admin } from "better-auth/plugins";
-import { ac, adminRole, superAdminRole } from "./auth-access";
 import { eq } from "drizzle-orm";
 import { createElement } from "react";
 import { env } from "../../env";
+import { ac, adminRole, superAdminRole } from "./auth-access";
 
 export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
@@ -60,6 +59,12 @@ export const auth = betterAuth({
   databaseHooks: {
     session: {
       create: {
+        before: async (session, ctx) => {
+          const user = await db.query.users.findFirst({
+            where: eq(users.id, session.userId),
+          });
+          if (user?.deletedAt) return false;
+        },
         after: async (session) => {
           try {
             const user = await db.query.users.findFirst({

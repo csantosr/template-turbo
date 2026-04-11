@@ -1,5 +1,6 @@
 "use client";
 
+import { CaretDownIcon, CaretUpIcon } from "@phosphor-icons/react";
 import {
   Badge,
   Input,
@@ -10,13 +11,14 @@ import {
   TableHeader,
   TableRow,
 } from "@repo/ui";
-import { trpc } from "@/trpc/client";
 import { useEffect, useState } from "react";
+import { trpc } from "@/trpc/client";
 import { BanUserDialog } from "./_components/ban-user-dialog";
 import { InviteUserDialog } from "./_components/invite-user-dialog";
 import { RemoveUserDialog } from "./_components/remove-user-dialog";
 import { ResendVerificationDialog } from "./_components/resend-verification-dialog";
 import { ResetPasswordDialog } from "./_components/reset-password-dialog";
+import { RestoreUserDialog } from "./_components/restore-user-dialog";
 import { UnbanUserDialog } from "./_components/unban-user-dialog";
 import { UserRbacDialog } from "./_components/user-rbac-dialog";
 
@@ -29,6 +31,7 @@ interface UserRow {
   banReason: string | null;
   emailVerified: boolean;
   createdAt: string | Date;
+  deletedAt: string | Date | null;
 }
 
 const PAGE_SIZE = 20;
@@ -37,6 +40,8 @@ export default function UsersPage() {
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
   const [page, setPage] = useState(1);
+  const [showDeleted, setShowDeleted] = useState(false);
+  const [deletedPage, setDeletedPage] = useState(1);
 
   const { data: myPerms } = trpc.rbac.myPermissions.useQuery();
   const permSet = new Set(myPerms ?? []);
@@ -45,9 +50,14 @@ export default function UsersPage() {
   const canDelete = permSet.has("users:delete");
   const canManageRoles = permSet.has("roles:assign");
   const canBan = permSet.has("users:ban");
+  const canReadDeletions = permSet.has("userDeletions:read");
+  const canRestore = permSet.has("userDeletions:restore");
 
   useEffect(() => {
-    const t = setTimeout(() => { setDebouncedSearch(search); setPage(1); }, 300);
+    const t = setTimeout(() => {
+      setDebouncedSearch(search);
+      setPage(1);
+    }, 300);
     return () => clearTimeout(t);
   }, [search]);
 
@@ -57,9 +67,22 @@ export default function UsersPage() {
     pageSize: PAGE_SIZE,
   });
 
+  const { data: deletedData, isLoading: deletedLoading } = trpc.user.listDeleted.useQuery(
+    {
+      search: debouncedSearch || undefined,
+      page: deletedPage,
+      pageSize: PAGE_SIZE,
+    },
+    { enabled: showDeleted },
+  );
+
   const users = (data?.users ?? []) as unknown as UserRow[];
   const total = data?.total ?? 0;
   const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  const deletedUsers = (deletedData?.users ?? []) as unknown as UserRow[];
+  const deletedTotal = deletedData?.total ?? 0;
+  const deletedTotalPages = Math.max(1, Math.ceil(deletedTotal / PAGE_SIZE));
 
   return (
     <div className="flex flex-col gap-6 p-6 md:p-8">
@@ -90,11 +113,15 @@ export default function UsersPage() {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell className="py-12 text-center text-muted-foreground" colSpan={7}>Loading...</TableCell>
+              <TableCell className="py-12 text-center text-muted-foreground" colSpan={7}>
+                Loading...
+              </TableCell>
             </TableRow>
           ) : users.length === 0 ? (
             <TableRow>
-              <TableCell className="py-12 text-center text-muted-foreground" colSpan={7}>No users found.</TableCell>
+              <TableCell className="py-12 text-center text-muted-foreground" colSpan={7}>
+                No users found.
+              </TableCell>
             </TableRow>
           ) : (
             users.map((user) => (
@@ -105,7 +132,10 @@ export default function UsersPage() {
                   {user.roles.length > 0 ? (
                     <div className="flex flex-wrap gap-1">
                       {user.roles.map((r) => (
-                        <span key={r.id} className="border border-border px-1.5 py-0.5 font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                        <span
+                          key={r.id}
+                          className="border border-border px-1.5 py-0.5 font-mono text-xs uppercase tracking-widest text-muted-foreground"
+                        >
                           {r.id}
                         </span>
                       ))}
@@ -129,27 +159,51 @@ export default function UsersPage() {
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
-                  {new Date(user.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                  {new Date(user.createdAt).toLocaleDateString("en-US", {
+                    month: "short",
+                    day: "numeric",
+                    year: "numeric",
+                  })}
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-4">
                     {canUpdate && !user.emailVerified && (
-                      <ResendVerificationDialog userId={user.id} userName={user.name} userEmail={user.email} />
+                      <ResendVerificationDialog
+                        userId={user.id}
+                        userName={user.name}
+                        userEmail={user.email}
+                      />
                     )}
                     {canUpdate && (
-                      <ResetPasswordDialog userId={user.id} userName={user.name} userEmail={user.email} />
+                      <ResetPasswordDialog
+                        userId={user.id}
+                        userName={user.name}
+                        userEmail={user.email}
+                      />
                     )}
                     {canManageRoles && (
-                      <UserRbacDialog userId={user.id} userName={user.name} userEmail={user.email} />
+                      <UserRbacDialog
+                        userId={user.id}
+                        userName={user.name}
+                        userEmail={user.email}
+                      />
                     )}
                     {canBan && !user.banned && (
                       <BanUserDialog userId={user.id} userName={user.name} userEmail={user.email} />
                     )}
                     {canBan && user.banned && (
-                      <UnbanUserDialog userId={user.id} userName={user.name} userEmail={user.email} />
+                      <UnbanUserDialog
+                        userId={user.id}
+                        userName={user.name}
+                        userEmail={user.email}
+                      />
                     )}
                     {canDelete && (
-                      <RemoveUserDialog userId={user.id} userName={user.name} userEmail={user.email} />
+                      <RemoveUserDialog
+                        userId={user.id}
+                        userName={user.name}
+                        userEmail={user.email}
+                      />
                     )}
                   </div>
                 </TableCell>
@@ -167,14 +221,18 @@ export default function UsersPage() {
         {totalPages > 1 && (
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
               className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
             >
               ← Prev
             </button>
-            <span className="font-mono text-sm text-muted-foreground">{page} / {totalPages}</span>
+            <span className="font-mono text-sm text-muted-foreground">
+              {page} / {totalPages}
+            </span>
             <button
+              type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
@@ -184,6 +242,118 @@ export default function UsersPage() {
           </div>
         )}
       </div>
+
+      {/* Deletions Section */}
+      {canReadDeletions && (
+        <div className="flex flex-col gap-4 border-t-2 border-border pt-6">
+          <button
+            type="button"
+            onClick={() => setShowDeleted((s) => !s)}
+            className="flex items-center gap-2 font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
+          >
+            {showDeleted ? (
+              <CaretUpIcon weight="bold" size={14} />
+            ) : (
+              <CaretDownIcon weight="bold" size={14} />
+            )}
+            Deletions
+          </button>
+
+          {showDeleted && (
+            <>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Email</TableHead>
+                    <TableHead>Deleted At</TableHead>
+                    <TableHead>Joined</TableHead>
+                    <TableHead className="text-right">Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {deletedLoading ? (
+                    <TableRow>
+                      <TableCell className="py-12 text-center text-muted-foreground" colSpan={5}>
+                        Loading...
+                      </TableCell>
+                    </TableRow>
+                  ) : deletedUsers.length === 0 ? (
+                    <TableRow>
+                      <TableCell className="py-12 text-center text-muted-foreground" colSpan={5}>
+                        No deleted users.
+                      </TableCell>
+                    </TableRow>
+                  ) : (
+                    deletedUsers.map((user) => (
+                      <TableRow key={user.id}>
+                        <TableCell className="font-bold">{user.name}</TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {user.email}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {user.deletedAt
+                            ? new Date(user.deletedAt).toLocaleDateString("en-US", {
+                              month: "short",
+                              day: "numeric",
+                              year: "numeric",
+                            })
+                            : "—"}
+                        </TableCell>
+                        <TableCell className="text-sm text-muted-foreground">
+                          {new Date(user.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {canRestore && (
+                            <RestoreUserDialog
+                              userId={user.id}
+                              userName={user.name}
+                              userEmail={user.email}
+                            />
+                          )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+
+              {deletedTotalPages > 1 && (
+                <div className="flex items-center justify-between">
+                  <p className="font-mono text-sm text-muted-foreground">
+                    {deletedTotal} deleted user{deletedTotal !== 1 ? "s" : ""} total
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setDeletedPage((p) => Math.max(1, p - 1))}
+                      disabled={deletedPage === 1}
+                      className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
+                    >
+                      ← Prev
+                    </button>
+                    <span className="font-mono text-sm text-muted-foreground">
+                      {deletedPage} / {deletedTotalPages}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setDeletedPage((p) => Math.min(deletedTotalPages, p + 1))}
+                      disabled={deletedPage === deletedTotalPages}
+                      className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
+                    >
+                      Next →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }

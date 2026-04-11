@@ -15,6 +15,7 @@ export const PERMISSIONS = {
   roles: ["create", "read", "update", "delete", "assign"],
   settings: ["read", "update"],
   activity: ["read"],
+  userDeletions: ["read", "restore"],
 } as const;
 
 export type Resource = keyof typeof PERMISSIONS;
@@ -23,6 +24,4 @@ export type Action<R extends Resource> = (typeof PERMISSIONS)[R][number];
 /** Flat list of every permission as { resource, action } — useful for UIs. */
 export const ALL_PERMISSIONS = (
   Object.entries(PERMISSIONS) as [Resource, readonly string[]][]
-).flatMap(([resource, actions]) =>
-  actions.map((action) => ({ resource, action })),
-);
+).flatMap(([resource, actions]) => actions.map((action) => ({ resource, action })));

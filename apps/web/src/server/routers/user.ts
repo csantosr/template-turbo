@@ -1,20 +1,18 @@
-import { auth } from "@/server/auth";
 import { activityLogs, roles, sessions, userRoles, users, verifications } from "@repo/db";
 import { InviteEmail, ResetPasswordEmail, sendEmail } from "@repo/email";
 import { updateUserSchema } from "@repo/validators";
 import { TRPCError } from "@trpc/server";
-import { and, count, eq, ilike, inArray, or } from "drizzle-orm";
+import { and, count, eq, ilike, inArray, isNotNull, isNull, or } from "drizzle-orm";
 import { createElement } from "react";
 import { z } from "zod";
+import { auth } from "@/server/auth";
 import { env } from "../../../env";
 import { protectedProcedure, publicProcedure, requirePermission, router } from "../trpc";
 
 export const userRouter = router({
-  hello: publicProcedure
-    .input(z.object({ name: z.string().optional() }))
-    .query(({ input }) => {
-      return { greeting: `Hello, ${input.name ?? "world"}!` };
-    }),
+  hello: publicProcedure.input(z.object({ name: z.string().optional() })).query(({ input }) => {
+    return { greeting: `Hello, ${input.name ?? "world"}!` };
+  }),
 
   me: protectedProcedure.query(({ ctx }) => {
     return ctx.session.user;
@@ -36,12 +34,11 @@ export const userRouter = router({
 
       const conditions = [];
       if (search) {
-        conditions.push(
-          or(ilike(users.name, `%${search}%`), ilike(users.email, `%${search}%`)),
-        );
+        conditions.push(or(ilike(users.name, `%${search}%`), ilike(users.email, `%${search}%`)));
       }
       if (role) conditions.push(ilike(users.role, role));
       if (status) conditions.push(eq(users.status, status));
+      conditions.push(isNull(users.deletedAt));
 
       const where = conditions.length > 0 ? and(...conditions) : undefined;
 
@@ -132,12 +129,14 @@ export const userRouter = router({
     }),
 
   acceptInvite: publicProcedure
-    .input(z.object({
-      token: z.string(),
-      email: z.string().email(),
-      name: z.string().min(1).max(100),
-      password: z.string().min(8),
-    }))
+    .input(
+      z.object({
+        token: z.string(),
+        email: z.string().email(),
+        name: z.string().min(1).max(100),
+        password: z.string().min(8),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { token, email, name, password } = input;
 
@@ -158,7 +157,10 @@ export const userRouter = router({
       });
 
       if (!result?.user?.id) {
-        throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Failed to create account." });
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Failed to create account.",
+        });
       }
 
       // The invite token itself confirms email ownership — mark as verified immediately
@@ -204,23 +206,26 @@ export const userRouter = router({
     }),
 
   remove: requirePermission("users", "delete")
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string(), reason: z.string().max(500).optional() }))
     .mutation(async ({ ctx, input }) => {
-      const [removed] = await ctx.db
-        .delete(users)
+      const [updated] = await ctx.db
+        .update(users)
+        .set({ deletedAt: new Date(), updatedAt: new Date() })
         .where(eq(users.id, input.id))
         .returning();
 
-      if (!removed) {
+      if (!updated) {
         throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
       }
+
+      await ctx.db.delete(sessions).where(eq(sessions.userId, input.id));
 
       await ctx.db.insert(activityLogs).values({
         id: crypto.randomUUID(),
         userId: ctx.session.user.id,
         userEmail: ctx.session.user.email,
         action: "REMOVE",
-        detail: `Removed ${removed.email}`,
+        detail: `Soft-deleted ${updated.email}${input.reason ? `: ${input.reason}` : ""}`,
         status: "success",
       });
 
@@ -360,6 +365,73 @@ export const userRouter = router({
         userEmail: ctx.session.user.email,
         action: "UNBAN",
         detail: `Unbanned ${user.email}`,
+        status: "success",
+      });
+
+      return { success: true };
+    }),
+
+  listDeleted: requirePermission("userDeletions", "read")
+    .input(
+      z.object({
+        search: z.string().optional(),
+        page: z.number().int().min(1).default(1),
+        pageSize: z.number().int().min(1).max(100).default(20),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const { search, page, pageSize } = input;
+      const offset = (page - 1) * pageSize;
+
+      const baseConditions = [isNotNull(users.deletedAt)] as const;
+      const searchConditions = search
+        ? ([or(ilike(users.name, `%${search}%`), ilike(users.email, `%${search}%`))] as const)
+        : [];
+      const allConditions = [...baseConditions, ...searchConditions];
+
+      const where = and(...allConditions);
+
+      const [rows, countRows] = await Promise.all([
+        ctx.db
+          .select()
+          .from(users)
+          .where(where)
+          .orderBy(users.createdAt)
+          .limit(pageSize)
+          .offset(offset),
+        ctx.db.select({ total: count() }).from(users).where(where),
+      ]);
+
+      return {
+        users: rows,
+        total: Number(countRows[0]?.total ?? 0),
+      };
+    }),
+
+  restore: requirePermission("userDeletions", "restore")
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.id, input.id),
+      });
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+      }
+      if (!user.deletedAt) {
+        throw new TRPCError({ code: "BAD_REQUEST", message: "User is not deleted." });
+      }
+
+      await ctx.db
+        .update(users)
+        .set({ deletedAt: null, updatedAt: new Date() })
+        .where(eq(users.id, input.id));
+
+      await ctx.db.insert(activityLogs).values({
+        id: crypto.randomUUID(),
+        userId: ctx.session.user.id,
+        userEmail: ctx.session.user.email,
+        action: "RESTORE",
+        detail: `Restored ${user.email}`,
         status: "success",
       });
 
