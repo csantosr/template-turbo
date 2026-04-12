@@ -28,7 +28,11 @@ function DialogOverlay({ className, ...props }: ComponentProps<typeof DialogPrim
   );
 }
 
-function DialogContent({ className, children, ...props }: ComponentProps<typeof DialogPrimitive.Content>) {
+function DialogContent({
+  className,
+  children,
+  ...props
+}: ComponentProps<typeof DialogPrimitive.Content>) {
   return (
     <DialogPortal>
       <DialogOverlay />
@@ -43,7 +47,10 @@ function DialogContent({ className, children, ...props }: ComponentProps<typeof 
           maxWidth: "32rem",
           boxShadow: "0 20px 25px -5px rgba(0,0,0,0.3)",
         }}
-        className={cn("flex flex-col gap-6 border-2 border-border bg-background p-6 outline-none", className)}
+        className={cn(
+          "flex flex-col gap-6 border-2 border-border bg-background p-6 outline-none",
+          className,
+        )}
         {...props}
       >
         {children}
@@ -51,11 +58,33 @@ function DialogContent({ className, children, ...props }: ComponentProps<typeof 
           style={{ position: "absolute", top: "1rem", right: "1rem" }}
           className="text-muted-foreground hover:text-foreground focus:outline-none"
         >
-          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 18 18"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+          >
             <line x1="3" y1="3" x2="15" y2="15" />
             <line x1="15" y1="3" x2="3" y2="15" />
           </svg>
-          <span style={{ position: "absolute", width: 1, height: 1, padding: 0, margin: -1, overflow: "hidden", clip: "rect(0,0,0,0)", whiteSpace: "nowrap", borderWidth: 0 }}>Close</span>
+          <span
+            style={{
+              position: "absolute",
+              width: 1,
+              height: 1,
+              padding: 0,
+              margin: -1,
+              overflow: "hidden",
+              clip: "rect(0,0,0,0)",
+              whiteSpace: "nowrap",
+              borderWidth: 0,
+            }}
+          >
+            Close
+          </span>
         </DialogClose>
       </DialogPrimitive.Content>
     </DialogPortal>
@@ -64,7 +93,11 @@ function DialogContent({ className, children, ...props }: ComponentProps<typeof 
 
 function DialogHeader({ className, ...props }: ComponentProps<"div">) {
   return (
-    <div className={cn("flex flex-col gap-1", className)} style={{ paddingRight: "1.5rem" }} {...props} />
+    <div
+      className={cn("flex flex-col gap-1", className)}
+      style={{ paddingRight: "1.5rem" }}
+      {...props}
+    />
   );
 }
 
@@ -77,7 +110,10 @@ function DialogTitle({ className, ...props }: ComponentProps<typeof DialogPrimit
   );
 }
 
-function DialogDescription({ className, ...props }: ComponentProps<typeof DialogPrimitive.Description>) {
+function DialogDescription({
+  className,
+  ...props
+}: ComponentProps<typeof DialogPrimitive.Description>) {
   return (
     <DialogPrimitive.Description
       className={cn("font-mono text-sm text-muted-foreground", className)}
@@ -87,9 +123,7 @@ function DialogDescription({ className, ...props }: ComponentProps<typeof Dialog
 }
 
 function DialogFooter({ className, ...props }: ComponentProps<"div">) {
-  return (
-    <div className={cn("flex justify-end gap-3", className)} {...props} />
-  );
+  return <div className={cn("flex justify-end gap-3", className)} {...props} />;
 }
 
 export {

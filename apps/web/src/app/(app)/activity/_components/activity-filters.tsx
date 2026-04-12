@@ -30,10 +30,11 @@ export function ActivityFilters({ value, onChange }: ActivityFiltersProps) {
           key={f}
           type="button"
           onClick={() => onChange(f)}
-          className={`shrink-0 px-4 py-2 font-mono text-sm uppercase tracking-widest transition-none ${value === f
-            ? "bg-foreground text-background"
-            : "bg-background text-muted-foreground hover:text-foreground"
-            }`}
+          className={`shrink-0 px-4 py-2 font-mono text-sm uppercase tracking-widest transition-none ${
+            value === f
+              ? "bg-foreground text-background"
+              : "bg-background text-muted-foreground hover:text-foreground"
+          }`}
         >
           {f}
         </button>
