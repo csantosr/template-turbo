@@ -1,6 +1,6 @@
 import * as schema from "@repo/db";
 import { activityLogs, db, users } from "@repo/db";
-import { ResetPasswordEmail, sendEmail, VerifyEmailEmail } from "@repo/email";
+import { ResetPasswordEmail, sendEmail, VerifyEmailEmail, WelcomeEmail } from "@repo/email";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { APIError, createAuthMiddleware } from "better-auth/api";
@@ -55,11 +55,21 @@ export const auth = betterAuth({
         react: createElement(VerifyEmailEmail, { name: user.name, url }),
       });
     },
+    afterEmailVerification: async (user) => {
+      void sendEmail({
+        to: user.email,
+        subject: `Welcome to template, ${user.name}!`,
+        react: createElement(WelcomeEmail, {
+          name: user.name ?? "there",
+          appUrl: env.NEXT_PUBLIC_APP_URL,
+        }),
+      });
+    },
   },
   databaseHooks: {
     session: {
       create: {
-        before: async (session, ctx) => {
+        before: async (session, _ctx) => {
           const user = await db.query.users.findFirst({
             where: eq(users.id, session.userId),
           });
@@ -77,7 +87,10 @@ export const auth = betterAuth({
               action: "LOGIN",
               status: "success",
             });
-          } catch { /* non-critical */ }
+          } catch {
+            /* non-critical */
+          }
+        },
       },
     },
   },

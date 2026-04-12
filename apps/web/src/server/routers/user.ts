@@ -1,5 +1,5 @@
 import { activityLogs, roles, sessions, userRoles, users, verifications } from "@repo/db";
-import { InviteEmail, ResetPasswordEmail, sendEmail } from "@repo/email";
+import { InviteEmail, ResetPasswordEmail, sendEmail, WelcomeEmail } from "@repo/email";
 import { updateUserSchema } from "@repo/validators";
 import { TRPCError } from "@trpc/server";
 import { and, count, eq, ilike, inArray, isNotNull, isNull, or } from "drizzle-orm";
@@ -164,6 +164,15 @@ export const userRouter = router({
       await ctx.db.update(users).set({ emailVerified: true }).where(eq(users.email, email));
 
       await ctx.db.delete(verifications).where(eq(verifications.id, verification.id));
+
+      void sendEmail({
+        to: email,
+        subject: `Welcome to template, ${name}!`,
+        react: createElement(WelcomeEmail, {
+          name,
+          appUrl: env.NEXT_PUBLIC_APP_URL,
+        }),
+      });
 
       return { success: true };
     }),

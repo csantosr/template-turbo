@@ -1,12 +1,12 @@
 import { render } from "@react-email/render";
 import nodemailer from "nodemailer";
-import { Resend } from "resend";
 import type { ReactElement } from "react";
+import { Resend } from "resend";
 
-export { WelcomeEmail } from "./templates/welcome";
-export { ResetPasswordEmail } from "./templates/reset-password";
-export { InviteEmail } from "./templates/invite";
-export { VerifyEmailEmail } from "./templates/verify-email";
+export { InviteEmail } from "../emails/invite";
+export { ResetPasswordEmail } from "../emails/reset-password";
+export { VerifyEmailEmail } from "../emails/verify-email";
+export { WelcomeEmail } from "../emails/welcome";
 
 interface SendEmailOptions {
   to: string | string[];
