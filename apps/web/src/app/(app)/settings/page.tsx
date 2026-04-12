@@ -7,9 +7,7 @@ export default function SettingsPage() {
         <p className="mb-1 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Your account
         </p>
-        <h1 className="font-mono text-2xl font-bold uppercase tracking-tight">
-          Settings
-        </h1>
+        <h1 className="font-mono text-2xl font-bold uppercase tracking-tight">Settings</h1>
       </div>
       <SettingsContent />
     </div>

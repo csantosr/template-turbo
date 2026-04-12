@@ -31,15 +31,17 @@ export function RegisterForm({ invite, initialEmail = "", initialName = "" }: Pr
 
     if (isInvite) {
       // Validate token + create account
-      const result = await acceptInvite.mutateAsync(
-        { token: invite!, email: initialEmail!, name, password },
-        {
-          onError: (e) => {
-            setError(e.message);
-            setLoading(false);
+      const result = await acceptInvite
+        .mutateAsync(
+          { token: invite!, email: initialEmail!, name, password },
+          {
+            onError: (e) => {
+              setError(e.message);
+              setLoading(false);
+            },
           },
-        },
-      ).catch(() => null);
+        )
+        .catch(() => null);
 
       if (!result) return;
 
@@ -122,8 +124,12 @@ export function RegisterForm({ invite, initialEmail = "", initialName = "" }: Pr
       )}
       <Button type="submit" disabled={loading} className="mt-2">
         {loading
-          ? isInvite ? "SETTING UP..." : "CREATING ACCOUNT..."
-          : isInvite ? "SET PASSWORD" : "CREATE ACCOUNT"}
+          ? isInvite
+            ? "SETTING UP..."
+            : "CREATING ACCOUNT..."
+          : isInvite
+            ? "SET PASSWORD"
+            : "CREATE ACCOUNT"}
       </Button>
     </form>
   );

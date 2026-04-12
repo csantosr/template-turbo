@@ -32,8 +32,7 @@ function VerifyEmailContent() {
                 Verification failed
               </p>
               <p className="mb-6 font-mono text-sm text-foreground">
-                This verification link is invalid or has expired. Request a new
-                one below.
+                This verification link is invalid or has expired. Request a new one below.
               </p>
               <a
                 href="/check-email"

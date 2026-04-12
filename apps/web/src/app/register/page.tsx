@@ -37,7 +37,10 @@ export default async function RegisterPage({ searchParams }: Props) {
           <div className="border-2 border-t-0 border-border px-8 py-4">
             <p className="font-mono text-sm text-muted-foreground">
               Already have an account?{" "}
-              <a href="/login" className="font-bold uppercase underline underline-offset-4 text-foreground">
+              <a
+                href="/login"
+                className="font-bold uppercase underline underline-offset-4 text-foreground"
+              >
                 Sign in
               </a>
             </p>
