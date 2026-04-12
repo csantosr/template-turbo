@@ -1,10 +1,10 @@
 "use client";
 
-import { ActionDialog, Button, DialogFooter } from "@repo/ui";
 import { PencilSimple } from "@phosphor-icons/react";
+import { ActionDialog, Button, DialogFooter, toast } from "@repo/ui";
+import { ALL_PERMISSIONS, PERMISSIONS } from "@repo/validators";
 import { useEffect, useState } from "react";
 import { trpc } from "@/trpc/client";
-import { ALL_PERMISSIONS, PERMISSIONS } from "@repo/validators";
 
 interface RoleData {
   id: string;
@@ -22,8 +22,8 @@ export function EditPermissionsDialog({ role }: Props) {
   const isSuperadmin = role.id === "superadmin";
 
   // Set of "resource:action" strings that are currently granted
-  const [granted, setGranted] = useState<Set<string>>(() =>
-    new Set(role.permissions.map((p) => `${p.resource}:${p.action}`)),
+  const [granted, setGranted] = useState<Set<string>>(
+    () => new Set(role.permissions.map((p) => `${p.resource}:${p.action}`)),
   );
   const [error, setError] = useState<string | null>(null);
 
@@ -33,7 +33,10 @@ export function EditPermissionsDialog({ role }: Props) {
   }, [role.permissions]);
 
   const update = trpc.rbac.updateRolePermissions.useMutation({
-    onSuccess: () => utils.rbac.listRoles.invalidate(),
+    onSuccess: () => {
+      utils.rbac.listRoles.invalidate();
+      toast.success("Permissions updated");
+    },
     onError: (e) => setError(e.message),
   });
 

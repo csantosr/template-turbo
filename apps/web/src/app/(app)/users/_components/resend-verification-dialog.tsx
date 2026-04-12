@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, ConfirmDialog } from "@repo/ui";
 import { EnvelopeSimple } from "@phosphor-icons/react";
+import { Button, ConfirmDialog, toast } from "@repo/ui";
 import { trpc } from "@/trpc/client";
 
 interface Props {
@@ -13,7 +13,11 @@ interface Props {
 export function ResendVerificationDialog({ userId, userName, userEmail }: Props) {
   const utils = trpc.useUtils();
   const resend = trpc.user.resendVerification.useMutation({
-    onSuccess: () => utils.activity.list.invalidate(),
+    onSuccess: () => {
+      utils.activity.list.invalidate();
+      toast.success("Verification email sent");
+    },
+    onError: (e) => toast.error(e.message),
   });
 
   return (
@@ -28,9 +32,7 @@ export function ResendVerificationDialog({ userId, userName, userEmail }: Props)
       confirmLabel="Send Email"
       confirmPendingLabel="Sending..."
       isPending={resend.isPending}
-      onConfirm={(close) =>
-        resend.mutate({ id: userId }, { onSuccess: close })
-      }
+      onConfirm={(close) => resend.mutate({ id: userId }, { onSuccess: close })}
     >
       <p className="font-mono text-base">
         Resend verification email to <span className="font-bold">{userName}</span>?

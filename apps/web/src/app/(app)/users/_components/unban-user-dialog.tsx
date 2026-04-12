@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, ConfirmDialog } from "@repo/ui";
 import { ArrowCounterClockwise } from "@phosphor-icons/react";
+import { Button, ConfirmDialog, toast } from "@repo/ui";
 import { trpc } from "@/trpc/client";
 
 interface Props {
@@ -13,7 +13,11 @@ interface Props {
 export function UnbanUserDialog({ userId, userName, userEmail }: Props) {
   const utils = trpc.useUtils();
   const unban = trpc.user.unban.useMutation({
-    onSuccess: () => utils.user.list.invalidate(),
+    onSuccess: () => {
+      utils.user.list.invalidate();
+      toast.success("Ban removed");
+    },
+    onError: (e) => toast.error(e.message),
   });
 
   return (
@@ -28,9 +32,7 @@ export function UnbanUserDialog({ userId, userName, userEmail }: Props) {
       confirmLabel="Remove Ban"
       confirmPendingLabel="Removing..."
       isPending={unban.isPending}
-      onConfirm={(close) =>
-        unban.mutate({ userId }, { onSuccess: close })
-      }
+      onConfirm={(close) => unban.mutate({ userId }, { onSuccess: close })}
     >
       <p className="font-mono text-base">
         Remove ban for <span className="font-bold">{userName}</span> ({userEmail})?

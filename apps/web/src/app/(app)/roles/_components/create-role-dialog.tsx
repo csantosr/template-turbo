@@ -1,7 +1,7 @@
 "use client";
 
-import { ActionDialog, Button, DialogFooter, Input } from "@repo/ui";
 import { Plus } from "@phosphor-icons/react";
+import { ActionDialog, Button, DialogFooter, Input, toast } from "@repo/ui";
 import { useState } from "react";
 import { trpc } from "@/trpc/client";
 
@@ -14,6 +14,7 @@ export function CreateRoleDialog() {
     onSuccess: () => {
       utils.rbac.listRoles.invalidate();
       setFields({ id: "", name: "", description: "" });
+      toast.success("Role created");
     },
     onError: (e) => setError(e.message),
   });
@@ -28,22 +29,39 @@ export function CreateRoleDialog() {
       }
       title="Create Role"
       description="Define a new role. Assign permissions to it from the roles list."
-      onOpenChange={(open) => { if (!open) { setError(null); setFields({ id: "", name: "", description: "" }); } }}
+      onOpenChange={(open) => {
+        if (!open) {
+          setError(null);
+          setFields({ id: "", name: "", description: "" });
+        }
+      }}
     >
       {({ close }) => (
         <>
           <div className="flex flex-col gap-4">
             <label className="flex flex-col gap-1">
-              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">Role ID <span className="normal-case tracking-normal text-muted-foreground/60">(slug, e.g. &ldquo;editor&rdquo;)</span></span>
+              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
+                Role ID{" "}
+                <span className="normal-case tracking-normal text-muted-foreground/60">
+                  (slug, e.g. &ldquo;editor&rdquo;)
+                </span>
+              </span>
               <Input
                 value={fields.id}
-                onChange={(e) => setFields((f) => ({ ...f, id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, "") }))}
+                onChange={(e) =>
+                  setFields((f) => ({
+                    ...f,
+                    id: e.target.value.toLowerCase().replace(/[^a-z0-9_-]/g, ""),
+                  }))
+                }
                 placeholder="editor"
                 className="rounded-none border-2 border-border bg-background font-mono text-base focus-visible:ring-0"
               />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">Display Name</span>
+              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
+                Display Name
+              </span>
               <Input
                 value={fields.name}
                 onChange={(e) => setFields((f) => ({ ...f, name: e.target.value }))}
@@ -52,7 +70,12 @@ export function CreateRoleDialog() {
               />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">Description <span className="normal-case tracking-normal text-muted-foreground/60">(optional)</span></span>
+              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
+                Description{" "}
+                <span className="normal-case tracking-normal text-muted-foreground/60">
+                  (optional)
+                </span>
+              </span>
               <Input
                 value={fields.description}
                 onChange={(e) => setFields((f) => ({ ...f, description: e.target.value }))}
@@ -77,7 +100,11 @@ export function CreateRoleDialog() {
             <Button
               onClick={() =>
                 create.mutate(
-                  { id: fields.id, name: fields.name, description: fields.description || undefined },
+                  {
+                    id: fields.id,
+                    name: fields.name,
+                    description: fields.description || undefined,
+                  },
                   { onSuccess: close },
                 )
               }

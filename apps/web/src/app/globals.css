@@ -78,6 +78,20 @@
   }
 }
 
+[data-sonner-toaster] {
+  font-family: var(--font-mono), monospace;
+}
+
+[data-sonner-toast] {
+  border-radius: 0 !important;
+}
+
+[data-sonner-toast] [data-close-button] {
+  border-radius: 0 !important;
+  font-family: var(--font-mono), monospace;
+  font-size: 0.75rem;
+}
+
 @media (prefers-reduced-motion: no-preference) {
   *,
   *::before,

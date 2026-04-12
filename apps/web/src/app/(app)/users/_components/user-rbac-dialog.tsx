@@ -1,7 +1,7 @@
 "use client";
 
 import { ShieldCheck, X } from "@phosphor-icons/react";
-import { ActionDialog, Badge, Button } from "@repo/ui";
+import { ActionDialog, Badge, Button, toast } from "@repo/ui";
 import { useState } from "react";
 import { trpc } from "@/trpc/client";
 
@@ -30,6 +30,7 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
       utils.rbac.getUserRbac.invalidate({ userId });
       utils.user.list.invalidate();
       setSelectedRoleId("");
+      toast.success("Role assigned");
     },
     onError: (e) => setError(e.message),
   });
@@ -38,6 +39,7 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
     onSuccess: () => {
       utils.rbac.getUserRbac.invalidate({ userId });
       utils.user.list.invalidate();
+      toast.success("Role revoked");
     },
     onError: (e) => setError(e.message),
   });
@@ -47,12 +49,16 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
       utils.rbac.getUserRbac.invalidate({ userId });
       setOverrideResource("");
       setOverrideAction("");
+      toast.success("Permission updated");
     },
     onError: (e) => setError(e.message),
   });
 
   const removePermission = trpc.rbac.removeUserPermission.useMutation({
-    onSuccess: () => utils.rbac.getUserRbac.invalidate({ userId }),
+    onSuccess: () => {
+      utils.rbac.getUserRbac.invalidate({ userId });
+      toast.success("Permission removed");
+    },
     onError: (e) => setError(e.message),
   });
 

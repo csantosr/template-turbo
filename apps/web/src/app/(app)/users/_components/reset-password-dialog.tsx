@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, ConfirmDialog } from "@repo/ui";
 import { Key } from "@phosphor-icons/react";
+import { Button, ConfirmDialog, toast } from "@repo/ui";
 import { trpc } from "@/trpc/client";
 
 interface Props {
@@ -13,7 +13,11 @@ interface Props {
 export function ResetPasswordDialog({ userId, userName, userEmail }: Props) {
   const utils = trpc.useUtils();
   const resetPassword = trpc.user.resetPassword.useMutation({
-    onSuccess: () => utils.activity.list.invalidate(),
+    onSuccess: () => {
+      utils.activity.list.invalidate();
+      toast.success("Password reset email sent");
+    },
+    onError: (e) => toast.error(e.message),
   });
 
   return (
@@ -28,9 +32,7 @@ export function ResetPasswordDialog({ userId, userName, userEmail }: Props) {
       confirmLabel="Send Email"
       confirmPendingLabel="Sending..."
       isPending={resetPassword.isPending}
-      onConfirm={(close) =>
-        resetPassword.mutate({ id: userId }, { onSuccess: close })
-      }
+      onConfirm={(close) => resetPassword.mutate({ id: userId }, { onSuccess: close })}
     >
       <p className="font-mono text-base">
         Send a password reset email to <span className="font-bold">{userName}</span>?

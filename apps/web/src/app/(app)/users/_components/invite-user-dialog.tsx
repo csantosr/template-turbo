@@ -1,7 +1,7 @@
 "use client";
 
-import { ActionDialog, Button, DialogFooter, Input } from "@repo/ui";
 import { PlusIcon } from "@phosphor-icons/react";
+import { ActionDialog, Button, DialogFooter, Input, toast } from "@repo/ui";
 import { useState } from "react";
 import { trpc } from "@/trpc/client";
 
@@ -14,6 +14,7 @@ export function InviteUserDialog() {
     onSuccess: () => {
       utils.user.list.invalidate();
       setForm({ name: "", email: "" });
+      toast.success("Invite sent");
     },
     onError: (e) => setError(e.message),
   });
@@ -29,13 +30,17 @@ export function InviteUserDialog() {
       }
       title="Invite User"
       description="They'll receive an email to set their password."
-      onOpenChange={(open) => { if (!open) setError(null); }}
+      onOpenChange={(open) => {
+        if (!open) setError(null);
+      }}
     >
       {({ close }) => (
         <>
           <div className="flex flex-col gap-4">
             <label className="flex flex-col gap-1">
-              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">Full Name</span>
+              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
+                Full Name
+              </span>
               <Input
                 value={form.name}
                 onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
@@ -44,7 +49,9 @@ export function InviteUserDialog() {
               />
             </label>
             <label className="flex flex-col gap-1">
-              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">Email</span>
+              <span className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
+                Email
+              </span>
               <Input
                 type="email"
                 value={form.email}

@@ -1,9 +1,9 @@
 "use client";
 
-import { authClient } from "@/lib/auth-client";
-import { Button, Input } from "@repo/ui";
+import { Button, Input, toast } from "@repo/ui";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { authClient } from "@/lib/auth-client";
 
 export function ResetPasswordForm() {
   const router = useRouter();
@@ -46,6 +46,7 @@ export function ResetPasswordForm() {
       return;
     }
 
+    toast.success("Password reset");
     router.push(callbackURL);
   }
 

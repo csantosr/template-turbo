@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowCounterClockwise } from "@phosphor-icons/react";
-import { Button, ConfirmDialog } from "@repo/ui";
+import { Button, ConfirmDialog, toast } from "@repo/ui";
 import { trpc } from "@/trpc/client";
 
 interface Props {
@@ -16,7 +16,9 @@ export function RestoreUserDialog({ userId, userName, userEmail }: Props) {
     onSuccess: () => {
       utils.user.list.invalidate();
       utils.user.listDeleted.invalidate();
+      toast.success("User restored");
     },
+    onError: (e) => toast.error(e.message),
   });
 
   return (

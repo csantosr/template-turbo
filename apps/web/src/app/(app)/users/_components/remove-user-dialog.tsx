@@ -1,7 +1,7 @@
 "use client";
 
 import { Trash } from "@phosphor-icons/react";
-import { Button, ConfirmDialog, Input } from "@repo/ui";
+import { Button, ConfirmDialog, Input, toast } from "@repo/ui";
 import { useState } from "react";
 import { trpc } from "@/trpc/client";
 
@@ -17,8 +17,11 @@ export function RemoveUserDialog({ userId, userName, userEmail }: Props) {
   const remove = trpc.user.remove.useMutation({
     onSuccess: () => {
       utils.user.list.invalidate();
+      utils.user.listDeleted.invalidate();
       setReason("");
+      toast.success("User removed");
     },
+    onError: (e) => toast.error(e.message),
   });
 
   return (

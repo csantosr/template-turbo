@@ -1,7 +1,7 @@
 "use client";
 
-import { Button, ConfirmDialog } from "@repo/ui";
 import { Trash } from "@phosphor-icons/react";
+import { Button, ConfirmDialog, toast } from "@repo/ui";
 import { trpc } from "@/trpc/client";
 
 interface Props {
@@ -12,13 +12,22 @@ interface Props {
 export function DeleteRoleDialog({ roleId, roleName }: Props) {
   const utils = trpc.useUtils();
   const del = trpc.rbac.deleteRole.useMutation({
-    onSuccess: () => utils.rbac.listRoles.invalidate(),
+    onSuccess: () => {
+      utils.rbac.listRoles.invalidate();
+      toast.success("Role deleted");
+    },
+    onError: (e) => toast.error(e.message),
   });
 
   return (
     <ConfirmDialog
       trigger={
-        <Button size="icon" variant="ghost" className="text-destructive hover:opacity-70" tooltip="Delete">
+        <Button
+          size="icon"
+          variant="ghost"
+          className="text-destructive hover:opacity-70"
+          tooltip="Delete"
+        >
           <Trash weight="bold" size={16} />
         </Button>
       }

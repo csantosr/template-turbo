@@ -1,9 +1,9 @@
 "use client";
 
-import { sendVerificationEmail, signIn } from "@/lib/auth-client";
-import { Button, Input } from "@repo/ui";
+import { Button, Input, toast } from "@repo/ui";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { sendVerificationEmail, signIn } from "@/lib/auth-client";
 
 export function LoginForm() {
   const router = useRouter();
@@ -46,6 +46,7 @@ export function LoginForm() {
   async function handleResend() {
     setLoading(true);
     await sendVerificationEmail({ email, callbackURL: "/verify-email" });
+    toast.success("Verification email sent");
     setResent(true);
     setLoading(false);
   }
@@ -59,7 +60,12 @@ export function LoginForm() {
         <Input
           type="email"
           value={email}
-          onChange={(e) => { setEmail(e.target.value); setUnverified(false); setResent(false); setBanned(null); }}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setUnverified(false);
+            setResent(false);
+            setBanned(null);
+          }}
           required
           autoComplete="email"
           className="rounded-none border-2 border-input font-mono text-base transition-none focus-visible:border-foreground focus-visible:ring-0"

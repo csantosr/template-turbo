@@ -1,9 +1,9 @@
-import { ThemeProvider } from "@/components/theme-provider";
-import { TRPCReactProvider } from "@/trpc/client";
-import { TooltipProvider } from "@repo/ui";
+import { Toaster, TooltipProvider } from "@repo/ui";
 import type { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import type { ReactNode } from "react";
+import { ThemeProvider } from "@/components/theme-provider";
+import { TRPCReactProvider } from "@/trpc/client";
 import "./globals.css";
 
 const outfit = Outfit({
@@ -23,7 +23,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className="font-mono antialiased">
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <TRPCReactProvider>
-            <TooltipProvider delayDuration={200}>{children}</TooltipProvider>
+            <TooltipProvider delayDuration={200}>
+              {children}
+              <Toaster />
+            </TooltipProvider>
           </TRPCReactProvider>
         </ThemeProvider>
       </body>
