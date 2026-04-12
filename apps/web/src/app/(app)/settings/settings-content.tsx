@@ -1,11 +1,39 @@
 "use client";
 
 import { ArrowRight } from "@phosphor-icons/react";
+import { ConfirmDialog, toast } from "@repo/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/trpc/client";
+import { ChangePasswordDialog } from "./change-password-dialog";
+
+function formatDate(date: Date | null | undefined): string {
+  if (!date) return "never";
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(date));
+}
 
 export function SettingsContent() {
   const { data: user, isLoading } = trpc.user.me.useQuery();
+
+  const logActivity = trpc.user.logActivity.useMutation();
+
+  async function handleRevokeAll(close: () => void) {
+    const { error } = await authClient.revokeOtherSessions();
+    if (error) {
+      toast.error(error.message ?? "Failed to revoke sessions");
+      return;
+    }
+    void logActivity.mutateAsync({
+      action: "SESSION_REVOKE",
+      detail: "Revoked all other sessions",
+    });
+    toast.success("All other sessions revoked");
+    close();
+  }
 
   if (isLoading) {
     return (
@@ -64,25 +92,42 @@ export function SettingsContent() {
           <div className="flex items-center justify-between">
             <div>
               <p className="font-mono text-base font-bold uppercase tracking-widest">Password</p>
-              <p className="font-mono text-sm text-muted-foreground">Last changed: never</p>
+              <p className="font-mono text-sm text-muted-foreground">
+                Last changed:{" "}
+                {formatDate(
+                  (user as Record<string, unknown>).passwordChangedAt as Date | null | undefined,
+                )}
+              </p>
             </div>
-            <button className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground">
-              <span className="flex items-center gap-1">
-                Change <ArrowRight weight="bold" size={14} />
-              </span>
-            </button>
+            <ChangePasswordDialog />
           </div>
           <div className="my-4 border-t border-border" />
           <div className="flex items-center justify-between">
             <div>
               <p className="font-mono text-base font-bold uppercase tracking-widest">Sessions</p>
-              <p className="font-mono text-sm text-muted-foreground">1 active session</p>
+              <p className="font-mono text-sm text-muted-foreground">Revoke all other sessions</p>
             </div>
-            <button className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground">
-              <span className="flex items-center gap-1">
-                Revoke all <ArrowRight weight="bold" size={14} />
-              </span>
-            </button>
+            <ConfirmDialog
+              trigger={
+                <button
+                  type="button"
+                  className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                >
+                  <span className="flex items-center gap-1">
+                    Revoke all <ArrowRight weight="bold" size={14} />
+                  </span>
+                </button>
+              }
+              title="Revoke All Sessions"
+              description="This will sign out all other devices."
+              confirmLabel="Revoke All"
+              confirmPendingLabel="Revoking..."
+              onConfirm={(close) => handleRevokeAll(close)}
+            >
+              <p className="font-mono text-base">
+                Are you sure you want to revoke all other sessions?
+              </p>
+            </ConfirmDialog>
           </div>
         </div>
       </section>
@@ -118,7 +163,10 @@ export function SettingsContent() {
                 Permanently delete your account and all data.
               </p>
             </div>
-            <button className="font-mono text-sm uppercase tracking-widest text-destructive hover:underline">
+            <button
+              type="button"
+              className="font-mono text-sm uppercase tracking-widest text-destructive hover:underline"
+            >
               <span className="flex items-center gap-1">
                 Delete <ArrowRight weight="bold" size={14} />
               </span>

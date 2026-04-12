@@ -13,6 +13,7 @@ export const users = pgTable("user", {
   banReason: text("banReason"),
   banExpires: timestamp("banExpires", { mode: "date" }),
   deletedAt: timestamp("deletedAt", { mode: "date" }),
+  passwordChangedAt: timestamp("passwordChangedAt", { mode: "date" }),
   createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updatedAt", { mode: "date" }).notNull().defaultNow(),
 });

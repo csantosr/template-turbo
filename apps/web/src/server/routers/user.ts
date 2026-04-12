@@ -1,5 +1,11 @@
 import { activityLogs, roles, sessions, userRoles, users, verifications } from "@repo/db";
-import { InviteEmail, ResetPasswordEmail, sendEmail, WelcomeEmail } from "@repo/email";
+import {
+  InviteEmail,
+  PasswordChangedEmail,
+  ResetPasswordEmail,
+  sendEmail,
+  WelcomeEmail,
+} from "@repo/email";
 import { updateUserSchema } from "@repo/validators";
 import { TRPCError } from "@trpc/server";
 import { and, count, eq, ilike, inArray, isNotNull, isNull, or } from "drizzle-orm";
@@ -14,8 +20,12 @@ export const userRouter = router({
     return { greeting: `Hello, ${input.name ?? "world"}!` };
   }),
 
-  me: protectedProcedure.query(({ ctx }) => {
-    return ctx.session.user;
+  me: protectedProcedure.query(async ({ ctx }) => {
+    const user = await ctx.db.query.users.findFirst({
+      where: eq(users.id, ctx.session.user.id),
+    });
+    if (!user) return null;
+    return { ...ctx.session.user, passwordChangedAt: user.passwordChangedAt };
   }),
 
   list: requirePermission("users", "read")
@@ -439,6 +449,136 @@ export const userRouter = router({
         status: "success",
       });
 
+      return { success: true };
+    }),
+
+  notifyPasswordChange: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = ctx.session.user;
+    const now = new Date();
+
+    await ctx.db
+      .update(users)
+      .set({ passwordChangedAt: now, updatedAt: now })
+      .where(eq(users.id, user.id));
+
+    const token = crypto.randomUUID();
+    await ctx.db.insert(verifications).values({
+      id: crypto.randomUUID(),
+      identifier: `secure-account:${user.id}`,
+      value: token,
+      expiresAt: new Date(Date.now() + 86_400_000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    const secureUrl = `${env.NEXT_PUBLIC_APP_URL}/secure-account?token=${token}`;
+
+    void sendEmail({
+      to: user.email,
+      subject: "Your password was changed",
+      react: createElement(PasswordChangedEmail, {
+        name: user.name,
+        secureUrl,
+      }),
+    });
+
+    await ctx.db.insert(activityLogs).values({
+      id: crypto.randomUUID(),
+      userId: user.id,
+      userEmail: user.email,
+      action: "PASSWORD_CHANGE",
+      detail: "Password changed",
+      status: "success",
+    });
+
+    return { success: true };
+  }),
+
+  secureAccount: publicProcedure
+    .input(z.object({ token: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const { token } = input;
+
+      const verification = await ctx.db.query.verifications.findFirst({
+        where: (v, { eq }) => eq(v.value, token),
+      });
+
+      if (!verification) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Invalid or expired link." });
+      }
+      if (verification.expiresAt < new Date()) {
+        throw new TRPCError({ code: "FORBIDDEN", message: "This link has expired." });
+      }
+
+      const userId = verification.identifier.replace("secure-account:", "");
+      const user = await ctx.db.query.users.findFirst({
+        where: eq(users.id, userId),
+      });
+      if (!user) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "User not found." });
+      }
+
+      await ctx.db.delete(sessions).where(eq(sessions.userId, userId));
+      await ctx.db.delete(verifications).where(eq(verifications.id, verification.id));
+
+      const resetToken = crypto.randomUUID();
+      await ctx.db.insert(verifications).values({
+        id: crypto.randomUUID(),
+        identifier: user.email,
+        value: resetToken,
+        expiresAt: new Date(Date.now() + 3_600_000),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const resetUrl = `${env.NEXT_PUBLIC_APP_URL}/reset-password?token=${resetToken}&callbackURL=/login`;
+
+      await sendEmail({
+        to: user.email,
+        subject: "Reset your password",
+        react: createElement(ResetPasswordEmail, { url: resetUrl, name: user.name }),
+      });
+
+      await ctx.db.insert(activityLogs).values({
+        id: crypto.randomUUID(),
+        userId: user.id,
+        userEmail: user.email,
+        action: "SECURITY_ALERT",
+        detail: "Unauthorized password change reported — all sessions revoked, password reset sent",
+        status: "success",
+      });
+
+      return { success: true, email: user.email };
+    }),
+
+  revokeAllSessions: protectedProcedure.mutation(async ({ ctx }) => {
+    const user = ctx.session.user;
+
+    await ctx.db.delete(sessions).where(eq(sessions.userId, user.id));
+
+    await ctx.db.insert(activityLogs).values({
+      id: crypto.randomUUID(),
+      userId: user.id,
+      userEmail: user.email,
+      action: "UPDATE",
+      detail: "Revoked all sessions",
+      status: "success",
+    });
+
+    return { success: true };
+  }),
+
+  logActivity: protectedProcedure
+    .input(z.object({ action: z.string(), detail: z.string().optional() }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.insert(activityLogs).values({
+        id: crypto.randomUUID(),
+        userId: ctx.session.user.id,
+        userEmail: ctx.session.user.email,
+        action: input.action,
+        detail: input.detail ?? null,
+        status: "success",
+      });
       return { success: true };
     }),
 });

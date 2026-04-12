@@ -4,6 +4,7 @@ import type { ReactElement } from "react";
 import { Resend } from "resend";
 
 export { InviteEmail } from "../emails/invite";
+export { PasswordChangedEmail } from "../emails/password-changed";
 export { ResetPasswordEmail } from "../emails/reset-password";
 export { VerifyEmailEmail } from "../emails/verify-email";
 export { WelcomeEmail } from "../emails/welcome";
