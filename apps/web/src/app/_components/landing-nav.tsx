@@ -1,7 +1,10 @@
 "use client";
 
-import { ThemeToggle } from "@/components/theme-toggle";
+import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useState } from "react";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { BRANDING } from "@/lib/branding";
 
 const TABS = [
   { id: "product", label: "PRODUCT" },
@@ -43,6 +46,15 @@ export function LandingNav() {
   return (
     <nav className="sticky top-0 z-40 border-b border-border bg-background">
       <div className="flex items-center px-6 md:px-16">
+        <Link href="/" className="mr-6 shrink-0 py-3">
+          <Image
+            src={BRANDING.logo.full}
+            alt={BRANDING.name}
+            width={100}
+            height={20}
+            className="h-5 w-auto"
+          />
+        </Link>
         <div className="flex flex-1 overflow-x-auto">
           {TABS.map((tab) => (
             <a

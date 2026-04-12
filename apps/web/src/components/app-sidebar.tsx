@@ -5,7 +5,6 @@ import {
   CaretDoubleLeft,
   CaretDoubleRight,
   Gear,
-  Lightning,
   Pulse,
   ShieldCheck,
   SignOut,
@@ -13,10 +12,13 @@ import {
   Users,
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { signOut } from "@/lib/auth-client";
+import { BRANDING } from "@/lib/branding";
 
 const NAV: { href: string; label: string; icon: Icon; permission: string | null }[] = [
   { href: "/dashboard", label: "DASHBOARD", icon: SquaresFour, permission: null },
@@ -36,6 +38,7 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
   const permSet = new Set(permissions);
   const pathname = usePathname();
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -44,6 +47,10 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
     const stored = localStorage.getItem("sidebar-collapsed");
     if (stored !== null) setCollapsed(stored === "true");
   }, []);
+
+  const isDark = resolvedTheme === "dark";
+  const logoSrc = isDark ? BRANDING.logo.fullDark : BRANDING.logo.full;
+  const iconSrc = isDark ? BRANDING.logo.iconDark : BRANDING.logo.icon;
 
   function toggle() {
     setCollapsed((c) => {
@@ -74,24 +81,35 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
       >
         {isCollapsed ? (
           <button
+            type="button"
             onClick={toggle}
             aria-label="Expand sidebar"
-            className="group relative flex items-center justify-center text-foreground"
+            className="group relative flex h-8 w-8 items-center justify-center text-foreground"
           >
-            <span className="transition-opacity duration-150 group-hover:opacity-0">
-              <Lightning weight="fill" size={20} />
-            </span>
-            <span className="absolute opacity-0 transition-opacity duration-150 group-hover:opacity-100">
-              <CaretDoubleRight weight="bold" size={18} />
-            </span>
+            <Image
+              src={iconSrc}
+              alt={BRANDING.name}
+              width={20}
+              height={20}
+              className="transition-opacity duration-150 group-hover:opacity-0"
+            />
+            <CaretDoubleRight
+              weight="bold"
+              size={18}
+              className="absolute opacity-0 transition-opacity duration-150 group-hover:opacity-100"
+            />
           </button>
         ) : (
           <>
-            <span className="flex items-center gap-2 font-mono text-sm font-bold uppercase tracking-widest">
-              <Lightning weight="fill" size={18} />
-              template
-            </span>
+            <Image
+              src={logoSrc}
+              alt={BRANDING.name}
+              width={100}
+              height={20}
+              className="h-5 w-auto"
+            />
             <button
+              type="button"
               onClick={toggle}
               className="text-muted-foreground hover:text-foreground"
               aria-label="Collapse sidebar"
@@ -140,6 +158,7 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
         )}
         {isCollapsed ? (
           <button
+            type="button"
             onClick={handleSignOut}
             title="Sign out"
             className="flex w-full items-center justify-center text-muted-foreground hover:text-foreground"

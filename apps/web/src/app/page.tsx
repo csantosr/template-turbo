@@ -1,6 +1,8 @@
-import { LandingNav } from "./_components/landing-nav";
 import { Button } from "@repo/ui";
+import Image from "next/image";
 import Link from "next/link";
+import { BRANDING } from "@/lib/branding";
+import { LandingNav } from "./_components/landing-nav";
 
 const FEATURES = [
   {
@@ -134,7 +136,6 @@ const FAQ = [
 export default function HomePage() {
   return (
     <main className="flex min-h-screen flex-col">
-
       <section className="flex min-h-screen flex-col justify-center border-b border-border px-6 py-24 md:px-16">
         <p className="mb-6 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Full-stack monorepo starter
@@ -150,8 +151,8 @@ export default function HomePage() {
           RAW.
         </h1>
         <p className="mt-8 max-w-xl font-mono text-base leading-relaxed text-muted-foreground">
-          A production-ready starter with Next.js, tRPC, Better Auth, and
-          Drizzle ORM — wired together so you can skip the boilerplate and ship.
+          A production-ready starter with Next.js, tRPC, Better Auth, and Drizzle ORM — wired
+          together so you can skip the boilerplate and ship.
         </p>
         <div className="mt-12 flex flex-col gap-4 sm:flex-row">
           <Button
@@ -169,14 +170,9 @@ export default function HomePage() {
         </div>
       </section>
 
-
       <LandingNav />
 
-
-      <section
-        id="product"
-        className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16"
-      >
+      <section id="product" className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16">
         <p className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           What's included
         </p>
@@ -209,11 +205,7 @@ export default function HomePage() {
         </div>
       </section>
 
-
-      <section
-        id="pricing"
-        className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16"
-      >
+      <section id="pricing" className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16">
         <p className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Simple pricing
         </p>
@@ -243,14 +235,10 @@ export default function HomePage() {
                   {p.tier}
                 </span>
                 <div className="mt-2 flex items-baseline gap-2">
-                  <span className="font-mono text-4xl font-bold uppercase">
-                    {p.price}
-                  </span>
+                  <span className="font-mono text-4xl font-bold uppercase">{p.price}</span>
                   <span
                     className={`font-mono text-sm uppercase tracking-widest ${
-                      p.highlight
-                        ? "text-background/60"
-                        : "text-muted-foreground"
+                      p.highlight ? "text-background/60" : "text-muted-foreground"
                     }`}
                   >
                     / {p.period}
@@ -268,11 +256,7 @@ export default function HomePage() {
               <ul className="flex flex-col gap-2">
                 {p.features.map((f) => (
                   <li key={f} className="flex items-start gap-2 font-mono text-sm">
-                    <span
-                      className={
-                        p.highlight ? "text-background/50" : "text-muted-foreground"
-                      }
-                    >
+                    <span className={p.highlight ? "text-background/50" : "text-muted-foreground"}>
                       —
                     </span>
                     <span>{f}</span>
@@ -295,11 +279,7 @@ export default function HomePage() {
         </div>
       </section>
 
-
-      <section
-        id="faq"
-        className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16"
-      >
+      <section id="faq" className="scroll-mt-12 border-b border-border px-6 py-24 md:px-16">
         <p className="mb-4 font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
           Frequently asked
         </p>
@@ -329,12 +309,15 @@ export default function HomePage() {
         </div>
       </section>
 
-
       <footer className="flex flex-col gap-6 border-t border-border px-6 py-10 md:flex-row md:items-center md:justify-between md:px-16">
         <div className="flex flex-col gap-1">
-          <span className="font-mono text-base font-bold uppercase tracking-widest">
-            template-turbo
-          </span>
+          <Image
+            src={BRANDING.logo.full}
+            alt={BRANDING.name}
+            width={100}
+            height={20}
+            className="h-5 w-auto"
+          />
           <span className="font-mono text-sm text-muted-foreground">
             Open source. MIT licensed.
           </span>

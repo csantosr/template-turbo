@@ -8,8 +8,7 @@
     "format": "biome format --write .",
     "db:generate": "turbo db:generate",
     "db:migrate": "turbo db:migrate",
-    "db:studio": "turbo db:studio",
-    "email:dev": "turbo email:dev"
+    "db:studio": "turbo db:studio"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.10",
@@ -19,10 +18,5 @@
   "packageManager": "pnpm@9.0.0",
   "engines": {
     "node": ">=18"
-  },
-  "pnpm": {
-    "overrides": {
-      "esbuild": "^0.23.0"
-    }
   }
 }
