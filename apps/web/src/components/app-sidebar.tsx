@@ -5,6 +5,7 @@ import {
   CaretDoubleLeft,
   CaretDoubleRight,
   Gear,
+  Kanban,
   Pulse,
   ShieldCheck,
   SignOut,
@@ -23,6 +24,7 @@ import { BRANDING } from "@/lib/branding";
 
 const NAV: { href: string; label: string; icon: Icon; permission: string | null }[] = [
   { href: "/dashboard", label: "DASHBOARD", icon: SquaresFour, permission: null },
+  { href: "/kanban", label: "KANBAN", icon: Kanban, permission: "kanban:read" },
   { href: "/users", label: "USERS", icon: Users, permission: "users:read" },
   { href: "/roles", label: "ROLES", icon: ShieldCheck, permission: "roles:read" },
   { href: "/activity", label: "ACTIVITY", icon: Pulse, permission: "activity:read" },

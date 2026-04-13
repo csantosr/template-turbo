@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 
 const TITLES: Record<string, string> = {
   "/dashboard": "DASHBOARD",
+  "/kanban": "KANBAN",
   "/users": "USERS",
   "/activity": "ACTIVITY",
   "/settings": "SETTINGS",
