@@ -84,6 +84,14 @@ export function LoginForm() {
           className="rounded-none border-2 border-input font-mono text-base transition-none focus-visible:border-foreground focus-visible:ring-0"
         />
       </div>
+      <div className="text-right">
+        <a
+          href="/forgot-password"
+          className="font-mono text-sm font-bold uppercase underline underline-offset-4 text-foreground"
+        >
+          Forgot password?
+        </a>
+      </div>
       {error && (
         <p className="border border-destructive px-3 py-2 font-mono text-sm uppercase tracking-wide text-destructive">
           {error}
