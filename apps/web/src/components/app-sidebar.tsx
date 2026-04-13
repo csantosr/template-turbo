@@ -21,6 +21,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { TypingTitle } from "@/components/typing-title";
 import { authClient } from "@/lib/auth-client";
 import { BRANDING } from "@/lib/branding";
 import { trpc } from "@/trpc/client";
@@ -151,7 +152,9 @@ export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }:
                     : "text-muted-foreground"
                 }`}
               >
-                <div className="truncate">{thread.title || "New conversation"}</div>
+                <div className="truncate">
+                  <TypingTitle title={thread.title} fallback="New conversation" />
+                </div>
                 <RelativeTime timestamp={thread.updatedAt} />
               </Link>
               {hoveredThread === thread.id && (
