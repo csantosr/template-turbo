@@ -1,6 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
-const PROTECTED = ["/dashboard", "/settings", "/users", "/activity"];
+const PROTECTED = ["/dashboard", "/settings", "/users", "/activity", "/chat"];
 
 export async function proxy(request: NextRequest) {
   const isProtected = PROTECTED.some((p) => request.nextUrl.pathname.startsWith(p));

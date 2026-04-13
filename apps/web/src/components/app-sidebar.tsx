@@ -4,25 +4,36 @@ import type { Icon } from "@phosphor-icons/react";
 import {
   CaretDoubleLeft,
   CaretDoubleRight,
+  ChatsCircle,
   Gear,
+  Plus,
   Pulse,
   ShieldCheck,
   SignOut,
   SquaresFour,
+  Trash,
   UserSwitch,
   Users,
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { BRANDING } from "@/lib/branding";
+import { trpc } from "@/trpc/client";
 
-const NAV: { href: string; label: string; icon: Icon; permission: string | null }[] = [
+const NAV: {
+  href: string;
+  label: string;
+  icon: Icon;
+  permission: string | null;
+  renderChildren?: () => React.ReactNode;
+}[] = [
   { href: "/dashboard", label: "DASHBOARD", icon: SquaresFour, permission: null },
+  { href: "/chat", label: "AI CHAT", icon: ChatsCircle, permission: null },
   { href: "/users", label: "USERS", icon: Users, permission: "users:read" },
   { href: "/roles", label: "ROLES", icon: ShieldCheck, permission: "roles:read" },
   { href: "/activity", label: "ACTIVITY", icon: Pulse, permission: "activity:read" },
@@ -39,10 +50,41 @@ interface AppSidebarProps {
 export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }: AppSidebarProps) {
   const permSet = new Set(permissions);
   const pathname = usePathname();
+  const router = useRouter();
   const { resolvedTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [stopping, setStopping] = useState(false);
+  const [hoveredThread, setHoveredThread] = useState<string | null>(null);
+
+  const utils = trpc.useUtils();
+
+  const { data: threadData } = trpc.chat.listThreads.useQuery();
+
+  const createThread = trpc.chat.createThread.useMutation({
+    onSuccess: (data) => {
+      utils.chat.listThreads.invalidate();
+      router.push(`/chat/${data.id}`);
+    },
+  });
+
+  const handleNewConversation = () => {
+    createThread.mutate();
+  };
+
+  const deleteThread = trpc.chat.deleteThread.useMutation({
+    onSuccess: () => {
+      utils.chat.listThreads.invalidate();
+      if (pathname.startsWith("/chat/")) {
+        const remainingThreads = threadData?.filter((t) => t.id !== hoveredThread) ?? [];
+        if (remainingThreads.length > 0) {
+          router.push(`/chat/${remainingThreads[0]!.id}`);
+        } else {
+          router.push("/chat");
+        }
+      }
+    },
+  });
 
   useEffect(() => {
     setMounted(true);
@@ -77,8 +119,67 @@ export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }:
     }
   }
 
-  // Use false until mounted to avoid hydration mismatch
   const isCollapsed = mounted && collapsed;
+  const isChatPage = pathname.startsWith("/chat");
+
+  const renderThreadList = () => {
+    if (!isChatPage || !threadData) return null;
+
+    return (
+      <div className="ml-6">
+        <button
+          type="button"
+          onClick={handleNewConversation}
+          className="flex w-full items-center gap-1 px-3 py-1.5 text-xs font-mono text-muted-foreground hover:text-foreground"
+        >
+          <Plus size={12} weight="bold" />
+          New conversation
+        </button>
+        {threadData.length > 0 &&
+          threadData.map((thread) => (
+            <div
+              key={thread.id}
+              className="group relative flex items-center justify-between border-l-2 border-transparent hover:border-muted-foreground"
+              onMouseEnter={() => setHoveredThread(thread.id)}
+              onMouseLeave={() => setHoveredThread(null)}
+            >
+              <Link
+                href={`/chat/${thread.id}`}
+                className={`flex-1 truncate px-3 py-1.5 text-xs font-mono ${
+                  pathname === `/chat/${thread.id}`
+                    ? "border-foreground text-foreground"
+                    : "text-muted-foreground"
+                }`}
+              >
+                <div className="truncate">{thread.title || "New conversation"}</div>
+                <RelativeTime timestamp={thread.updatedAt} />
+              </Link>
+              {hoveredThread === thread.id && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    deleteThread.mutate({ id: thread.id });
+                  }}
+                  className="mr-2 cursor-pointer text-muted-foreground hover:text-destructive"
+                  title="Delete conversation"
+                >
+                  <Trash size={12} weight="bold" />
+                </button>
+              )}
+            </div>
+          ))}
+      </div>
+    );
+  };
+
+  const navWithChildren = NAV.map((item) => {
+    if (item.href === "/chat") {
+      return { ...item, renderChildren: renderThreadList };
+    }
+    return item;
+  });
 
   return (
     <aside
@@ -133,28 +234,30 @@ export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }:
       </div>
 
       <nav className="flex flex-1 flex-col gap-0.5 p-2">
-        {NAV.filter((item) => item.permission === null || permSet.has(item.permission)).map(
-          (item) => {
+        {navWithChildren
+          .filter((item) => item.permission === null || permSet.has(item.permission))
+          .map((item) => {
             const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`);
             return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={isCollapsed ? item.label : undefined}
-                className={`flex items-center border-l-2 py-2 font-mono text-sm uppercase tracking-widest transition-none ${
-                  isCollapsed ? "justify-center px-2" : "gap-2.5 px-3"
-                } ${
-                  isActive
-                    ? "border-foreground text-foreground"
-                    : "border-transparent text-muted-foreground hover:border-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <item.icon weight="bold" size={16} />
-                {!isCollapsed && item.label}
-              </Link>
+              <div key={item.href}>
+                <Link
+                  href={item.href}
+                  title={isCollapsed ? item.label : undefined}
+                  className={`flex items-center border-l-2 py-2 font-mono text-sm uppercase tracking-widest transition-none ${
+                    isCollapsed ? "justify-center px-2" : "gap-2.5 px-3"
+                  } ${
+                    isActive
+                      ? "border-foreground text-foreground"
+                      : "border-transparent text-muted-foreground hover:border-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  <item.icon weight="bold" size={16} />
+                  {!isCollapsed && item.label}
+                </Link>
+                {!isCollapsed && item.renderChildren?.()}
+              </div>
             );
-          },
-        )}
+          })}
       </nav>
 
       <div className="border-t border-border p-3">
@@ -209,4 +312,26 @@ export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }:
       </div>
     </aside>
   );
+}
+
+function RelativeTime({ timestamp }: { timestamp: Date | string }) {
+  const now = new Date();
+  const date = new Date(timestamp);
+  const diff = now.getTime() - date.getTime();
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(diff / 3600000);
+  const days = Math.floor(diff / 86400000);
+
+  let text: string;
+  if (minutes < 1) text = "Just now";
+  else if (minutes < 60) text = `${minutes}m ago`;
+  else if (hours < 24) text = `${hours}hr ago`;
+  else if (days < 7) text = `${days}d ago`;
+  else
+    text = date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+    });
+
+  return <span className="text-[10px] text-muted-foreground/70">{text}</span>;
 }
