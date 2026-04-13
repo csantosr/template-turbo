@@ -112,7 +112,7 @@ export const userRouter = router({
       const token = crypto.randomUUID();
       await ctx.db.insert(verifications).values({
         id: crypto.randomUUID(),
-        identifier: email,
+        identifier: `invite:${email}`,
         value: token,
         expiresAt: new Date(Date.now() + 86_400_000),
         createdAt: new Date(),
@@ -160,7 +160,7 @@ export const userRouter = router({
       const { token, email, name, password } = input;
 
       const verification = await ctx.db.query.verifications.findFirst({
-        where: (v, { and, eq }) => and(eq(v.identifier, email), eq(v.value, token)),
+        where: (v, { and, eq }) => and(eq(v.identifier, `invite:${email}`), eq(v.value, token)),
       });
 
       if (!verification) {

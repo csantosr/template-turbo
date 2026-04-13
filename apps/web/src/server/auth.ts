@@ -1,5 +1,5 @@
 import * as schema from "@repo/db";
-import { activityLogs, db, users } from "@repo/db";
+import { activityLogs, db, users, verifications } from "@repo/db";
 import { ResetPasswordEmail, sendEmail, VerifyEmailEmail, WelcomeEmail } from "@repo/email";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -49,6 +49,11 @@ export const auth = betterAuth({
     sendOnSignUp: true,
     autoSignInAfterVerification: true,
     sendVerificationEmail: async ({ user, url }) => {
+      const isInviteSignup = await db.query.verifications.findFirst({
+        where: eq(verifications.identifier, `invite:${user.email}`),
+      });
+      if (isInviteSignup) return;
+
       void sendEmail({
         to: user.email,
         subject: "Verify your email address",
