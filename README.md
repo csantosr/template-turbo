@@ -15,6 +15,7 @@ A monorepo template for bootstrapping web projects with a standardized full-stac
 | Validation | Zod v4 |
 | Email | React Email + Resend (prod) / Nodemailer + Mailpit (dev) |
 | UI | Radix UI + CVA + shadcn/ui pattern, Tailwind CSS v4 |
+| Markdown | react-markdown + remark-gfm |
 | Styling | Brutalist theme (no border-radius, monospace, heavy borders, dark mode) |
 | Lint/Format | Biome v2 |
 | Icons | Phosphor Icons |
