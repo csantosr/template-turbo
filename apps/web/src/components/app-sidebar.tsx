@@ -5,6 +5,7 @@ import {
   CaretDoubleLeft,
   CaretDoubleRight,
   ChatsCircle,
+  Cube,
   Gear,
   Plus,
   Kanban,
@@ -39,6 +40,7 @@ const NAV: {
   { href: "/users", label: "USERS", icon: Users, permission: "users:read" },
   { href: "/roles", label: "ROLES", icon: ShieldCheck, permission: "roles:read" },
   { href: "/activity", label: "ACTIVITY", icon: Pulse, permission: "activity:read" },
+  { href: "/components", label: "COMPONENTS", icon: Cube, permission: null },
   { href: "/settings", label: "SETTINGS", icon: Gear, permission: null },
 ];
 

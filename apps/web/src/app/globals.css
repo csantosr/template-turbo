@@ -101,3 +101,149 @@
     transition-timing-function: ease;
   }
 }
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+.animate-accordion-down {
+  animation: accordion-down 0.2s ease-out;
+}
+
+.animate-accordion-up {
+  animation: accordion-up 0.2s ease-out;
+}
+
+.sheet-enter {
+  transform: translateX(0);
+}
+.sheet-exit {
+  transform: translateX(100%);
+}
+
+[data-state="open"].slide-in-from-right {
+  animation: sheet-in-right 0.2s ease-out;
+}
+[data-state="closed"].slide-out-to-right {
+  animation: sheet-out-right 0.2s ease-in;
+}
+[data-state="open"].slide-in-from-left {
+  animation: sheet-in-left 0.2s ease-out;
+}
+[data-state="closed"].slide-out-to-left {
+  animation: sheet-out-left 0.2s ease-in;
+}
+[data-state="open"].slide-in-from-top {
+  animation: sheet-in-top 0.2s ease-out;
+}
+[data-state="closed"].slide-out-to-top {
+  animation: sheet-out-top 0.2s ease-in;
+}
+[data-state="open"].slide-in-from-bottom {
+  animation: sheet-in-bottom 0.2s ease-out;
+}
+[data-state="closed"].slide-out-to-bottom {
+  animation: sheet-out-bottom 0.2s ease-in;
+}
+
+@keyframes sheet-in-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-out-right {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+@keyframes sheet-in-left {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+@keyframes sheet-out-left {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+@keyframes sheet-in-top {
+  from {
+    transform: translateY(-100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes sheet-out-top {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-100%);
+  }
+}
+@keyframes sheet-in-bottom {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes sheet-out-bottom {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+[data-state="open"].fade-in-0 {
+  animation: fade-in 0.2s ease-out;
+}
+[data-state="closed"].fade-out-0 {
+  animation: fade-out 0.2s ease-in;
+}

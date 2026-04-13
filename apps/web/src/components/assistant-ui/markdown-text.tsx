@@ -81,13 +81,9 @@ const MarkdownText = (props: any) => {
         ),
         thead: ({ children }) => <thead className="bg-muted">{children}</thead>,
         th: ({ children }) => (
-          <th className="border border-foreground px-3 py-2 text-left font-semibold">
-            {children}
-          </th>
+          <th className="border border-foreground px-3 py-2 text-left font-semibold">{children}</th>
         ),
-        td: ({ children }) => (
-          <td className="border border-foreground px-3 py-2">{children}</td>
-        ),
+        td: ({ children }) => <td className="border border-foreground px-3 py-2">{children}</td>,
         hr: () => <hr className="border-foreground my-6" />,
       }}
     >
