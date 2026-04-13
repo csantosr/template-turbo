@@ -1,6 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
+import { TypingTitle } from "@/components/typing-title";
 import { trpc } from "@/trpc/client";
 
 const TITLES: Record<string, string> = {
@@ -35,7 +36,14 @@ export function AppTopBar() {
   } else if (pathname === "/settings") {
     title = "SETTINGS";
   } else if (pathname.startsWith("/chat")) {
-    title = thread?.title ? `CHAT / ${thread.title}` : "CHAT / NEW CONVERSATION";
+    const displayTitle = thread?.title ? `CHAT / ${thread.title}` : null;
+    return (
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-border px-6">
+        <span className="font-mono text-sm uppercase tracking-[0.3em] text-muted-foreground">
+          <TypingTitle title={displayTitle} fallback="CHAT / NEW CONVERSATION" />
+        </span>
+      </header>
+    );
   }
 
   return (
