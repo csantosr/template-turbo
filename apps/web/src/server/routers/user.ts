@@ -87,7 +87,15 @@ export const userRouter = router({
     }),
 
   invite: requirePermission("users", "create")
-    .input(z.object({ name: z.string().min(1).max(100), email: z.string().email() }))
+    .input(
+      z.object({
+        name: z
+          .string()
+          .min(1, { message: "Name is required" })
+          .max(100, { message: "Name must be 100 characters or less" }),
+        email: z.string().email({ message: "Please enter a valid email address" }),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const { name, email } = input;
 
@@ -140,9 +148,12 @@ export const userRouter = router({
     .input(
       z.object({
         token: z.string(),
-        email: z.string().email(),
-        name: z.string().min(1).max(100),
-        password: z.string().min(8),
+        email: z.string().email({ message: "Please enter a valid email address" }),
+        name: z
+          .string()
+          .min(1, { message: "Name is required" })
+          .max(100, { message: "Name must be 100 characters or less" }),
+        password: z.string().min(8, { message: "Password must be at least 8 characters" }),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -221,7 +232,15 @@ export const userRouter = router({
     }),
 
   remove: requirePermission("users", "delete")
-    .input(z.object({ id: z.string(), reason: z.string().max(500).optional() }))
+    .input(
+      z.object({
+        id: z.string(),
+        reason: z
+          .string()
+          .max(500, { message: "Reason must be 500 characters or less" })
+          .optional(),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const [updated] = await ctx.db
         .update(users)
@@ -320,8 +339,15 @@ export const userRouter = router({
     .input(
       z.object({
         userId: z.string(),
-        reason: z.string().max(500).optional(),
-        expiresIn: z.number().int().positive().optional(),
+        reason: z
+          .string()
+          .max(500, { message: "Reason must be 500 characters or less" })
+          .optional(),
+        expiresIn: z
+          .number()
+          .int()
+          .positive({ message: "Expiration must be a positive number" })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

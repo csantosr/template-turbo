@@ -1,45 +1,51 @@
 "use client";
 
 import { ActionDialog, Button, Input, toast } from "@repo/ui";
+import { changePasswordSchema } from "@repo/validators";
 import { useState } from "react";
 import { authClient } from "@/lib/auth-client";
 import { trpc } from "@/trpc/client";
 
 export function ChangePasswordDialog() {
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState({
+    currentPassword: "",
+    newPassword: "",
+    confirmPassword: "",
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
   const notifyPasswordChange = trpc.user.notifyPasswordChange.useMutation();
 
-  async function handleSubmit(close: () => void) {
-    setError(null);
+  function handleSubmit(e: React.FormEvent<HTMLFormElement>): void {
+    e.preventDefault();
+    const result = changePasswordSchema.safeParse(form);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as string;
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
+      setErrors(fieldErrors);
+      return;
+    }
+    setErrors({});
+    doChangePassword();
+  }
 
-    if (newPassword.length < 8) {
-      setError("New password must be at least 8 characters.");
-      return;
-    }
-    if (newPassword === currentPassword) {
-      setError("New password must be different from your current password.");
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      setError("Passwords do not match.");
-      return;
-    }
-
+  async function doChangePassword(close?: () => void) {
     setLoading(true);
 
     const { error: authError } = await authClient.changePassword({
-      currentPassword,
-      newPassword,
+      currentPassword: form.currentPassword,
+      newPassword: form.newPassword,
       revokeOtherSessions: true,
     });
 
     if (authError) {
-      setError(authError.message ?? "Failed to change password.");
+      setErrors({ form: authError.message ?? "Failed to change password." });
       setLoading(false);
       return;
     }
@@ -51,7 +57,7 @@ export function ChangePasswordDialog() {
     }
 
     toast.success("Password changed. Please sign in again.");
-    close();
+    close?.();
 
     await authClient.signOut();
     window.location.href = "/login";
@@ -69,15 +75,12 @@ export function ChangePasswordDialog() {
       }
       title="Change Password"
       description="Enter your current password and choose a new one."
+      onOpenChange={(open) => {
+        if (!open) setErrors({});
+      }}
     >
       {({ close }) => (
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit(close);
-          }}
-          className="flex flex-col gap-4"
-        >
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <div className="flex flex-col gap-1">
             <label
               htmlFor="current-password"
@@ -87,10 +90,14 @@ export function ChangePasswordDialog() {
             </label>
             <Input
               id="current-password"
+              name="currentPassword"
               type="password"
-              value={currentPassword}
-              onChange={(e) => setCurrentPassword(e.target.value)}
-              required
+              value={form.currentPassword}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, currentPassword: e.target.value }));
+                setErrors((er) => ({ ...er, currentPassword: "" }));
+              }}
+              error={errors.currentPassword}
               autoComplete="current-password"
               className="rounded-none border-2 border-input font-mono text-base transition-none focus-visible:border-foreground focus-visible:ring-0"
             />
@@ -104,10 +111,14 @@ export function ChangePasswordDialog() {
             </label>
             <Input
               id="new-password"
+              name="newPassword"
               type="password"
-              value={newPassword}
-              onChange={(e) => setNewPassword(e.target.value)}
-              required
+              value={form.newPassword}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, newPassword: e.target.value }));
+                setErrors((er) => ({ ...er, newPassword: "" }));
+              }}
+              error={errors.newPassword}
               autoComplete="new-password"
               className="rounded-none border-2 border-input font-mono text-base transition-none focus-visible:border-foreground focus-visible:ring-0"
             />
@@ -121,17 +132,21 @@ export function ChangePasswordDialog() {
             </label>
             <Input
               id="confirm-password"
+              name="confirmPassword"
               type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
+              value={form.confirmPassword}
+              onChange={(e) => {
+                setForm((f) => ({ ...f, confirmPassword: e.target.value }));
+                setErrors((er) => ({ ...er, confirmPassword: "" }));
+              }}
+              error={errors.confirmPassword}
               autoComplete="new-password"
               className="rounded-none border-2 border-input font-mono text-base transition-none focus-visible:border-foreground focus-visible:ring-0"
             />
           </div>
-          {error && (
+          {errors.form && (
             <p className="border border-destructive px-3 py-2 font-mono text-sm uppercase tracking-wide text-destructive">
-              {error}
+              {errors.form}
             </p>
           )}
           <div className="flex justify-end gap-3 mt-2">

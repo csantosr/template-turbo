@@ -37,11 +37,20 @@ export const rbacRouter = router({
       z.object({
         id: z
           .string()
-          .min(1)
-          .max(50)
-          .regex(/^[a-z0-9_-]+$/),
-        name: z.string().min(1).max(100),
-        description: z.string().max(500).optional(),
+          .min(1, { message: "Role ID is required" })
+          .max(50, { message: "Role ID must be 50 characters or less" })
+          .regex(/^[a-z0-9_-]+$/, {
+            message:
+              "Role ID must contain only lowercase letters, numbers, hyphens, and underscores",
+          }),
+        name: z
+          .string()
+          .min(1, { message: "Role name is required" })
+          .max(100, { message: "Role name must be 100 characters or less" }),
+        description: z
+          .string()
+          .max(500, { message: "Description must be 500 characters or less" })
+          .optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

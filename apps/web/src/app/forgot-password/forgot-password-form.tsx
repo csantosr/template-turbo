@@ -1,89 +1,60 @@
 "use client";
 
-import { Button, Input, toast } from "@repo/ui";
+import { Button, Form, FormField, toast } from "@repo/ui";
+import { forgotPasswordSchema } from "@repo/validators";
 import { useState } from "react";
 import { requestPasswordReset } from "@/lib/auth-client";
 
 export function ForgotPasswordForm() {
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  async function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
-    setError(null);
-    setLoading(true);
+    const formData = new FormData(e.currentTarget);
+    const data = {
+      email: formData.get("email") as string,
+    };
 
-    const { error } = await requestPasswordReset({
-      email,
-      redirectTo: `${window.location.origin}/reset-password`,
-    });
-
-    if (error) {
-      setError(error.message ?? "Failed to send reset email");
-      setLoading(false);
+    const result = forgotPasswordSchema.safeParse(data);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      for (const issue of result.error.issues) {
+        const field = issue.path[0] as string;
+        if (!fieldErrors[field]) {
+          fieldErrors[field] = issue.message;
+        }
+      }
+      setErrors(fieldErrors);
       return;
     }
 
-    toast.success("Reset email sent");
-    setSent(true);
-    setLoading(false);
-  }
+    setErrors({});
+    setIsSubmitting(true);
 
-  async function handleResend() {
-    setLoading(true);
     await requestPasswordReset({
-      email,
+      email: data.email,
       redirectTo: `${window.location.origin}/reset-password`,
     });
-    toast.success("Reset email sent");
-    setLoading(false);
-  }
 
-  if (sent) {
-    return (
-      <div className="flex flex-col gap-4">
-        <p className="font-mono text-sm text-foreground">
-          We sent a reset link to <span className="font-bold">{email}</span>. Click the link in that
-          email to set a new password.
-        </p>
-        <Button
-          type="button"
-          variant="outline"
-          disabled={loading}
-          onClick={handleResend}
-          className="w-full"
-        >
-          {loading ? "SENDING..." : "RESEND RESET EMAIL"}
-        </Button>
-      </div>
-    );
+    toast.success("Reset email sent");
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      <div className="flex flex-col gap-1">
-        <label className="font-mono text-sm uppercase tracking-widest text-muted-foreground">
-          Email
-        </label>
-        <Input
+    <Form onSubmit={handleSubmit}>
+      <FormField name="email" label="Email" error={errors.email}>
+        <input
+          name="email"
           type="email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
           autoComplete="email"
-          className="rounded-none border-2 border-input font-mono text-base transition-none focus-visible:border-foreground focus-visible:ring-0"
+          disabled={isSubmitting}
+          className="flex h-9 w-full rounded-none border-2 border-input bg-transparent px-3 py-1 text-base font-mono transition-none focus-visible:outline-none focus-visible:border-foreground disabled:opacity-50"
         />
-      </div>
-      {error && (
-        <p className="border border-destructive px-3 py-2 font-mono text-sm uppercase tracking-wide text-destructive">
-          {error}
-        </p>
-      )}
-      <Button type="submit" disabled={loading} className="mt-2">
-        {loading ? "SENDING..." : "SEND RESET LINK"}
+      </FormField>
+
+      <Button type="submit" disabled={isSubmitting} className="mt-2">
+        {isSubmitting ? "SENDING..." : "SEND RESET LINK"}
       </Button>
-    </form>
+    </Form>
   );
 }

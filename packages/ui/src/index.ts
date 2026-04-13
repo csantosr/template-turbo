@@ -27,6 +27,11 @@ export {
   DialogTitle,
   DialogTrigger,
 } from "./components/dialog";
+export {
+  Form,
+  FormError,
+  FormField,
+} from "./components/form";
 export { Input, type InputProps } from "./components/input";
 export {
   Table,
