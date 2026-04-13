@@ -9,15 +9,16 @@ import {
   ShieldCheck,
   SignOut,
   SquaresFour,
+  UserSwitch,
   Users,
 } from "@phosphor-icons/react";
 import { Button } from "@repo/ui";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
-import { signOut } from "@/lib/auth-client";
+import { authClient } from "@/lib/auth-client";
 import { BRANDING } from "@/lib/branding";
 
 const NAV: { href: string; label: string; icon: Icon; permission: string | null }[] = [
@@ -32,15 +33,16 @@ interface AppSidebarProps {
   userName: string;
   userEmail: string;
   permissions: string[];
+  impersonatedBy?: string | null;
 }
 
-export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps) {
+export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }: AppSidebarProps) {
   const permSet = new Set(permissions);
   const pathname = usePathname();
-  const router = useRouter();
   const { resolvedTheme } = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [stopping, setStopping] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -61,8 +63,18 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
   }
 
   async function handleSignOut() {
-    await signOut();
-    router.push("/");
+    await authClient.signOut();
+    window.location.href = "/";
+  }
+
+  async function handleStopImpersonating() {
+    setStopping(true);
+    try {
+      await authClient.admin.stopImpersonating();
+      window.location.href = "/dashboard";
+    } finally {
+      setStopping(false);
+    }
   }
 
   // Use false until mounted to avoid hydration mismatch
@@ -156,7 +168,27 @@ export function AppSidebar({ userName, userEmail, permissions }: AppSidebarProps
             </p>
           </div>
         )}
-        {isCollapsed ? (
+        {impersonatedBy ? (
+          isCollapsed ? (
+            <button
+              type="button"
+              onClick={handleStopImpersonating}
+              disabled={stopping}
+              title="Stop impersonating"
+              className="flex w-full items-center justify-center text-yellow-600 hover:text-yellow-700"
+            >
+              <UserSwitch weight="bold" size={16} />
+            </button>
+          ) : (
+            <Button
+              onClick={handleStopImpersonating}
+              disabled={stopping}
+              className="w-full rounded-none border-2 border-yellow-600 bg-yellow-500 px-4 font-mono text-sm font-bold uppercase tracking-widest text-yellow-950 transition-none hover:bg-yellow-400 disabled:opacity-60"
+            >
+              {stopping ? "STOPPING..." : "STOP IMPERSONATING"}
+            </Button>
+          )
+        ) : isCollapsed ? (
           <button
             type="button"
             onClick={handleSignOut}

@@ -13,12 +13,14 @@
  */
 
 import { config } from "dotenv";
+
 config({ path: "../../apps/web/.env", quiet: true });
+
+import { ALL_PERMISSIONS } from "@repo/validators";
+import { eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "../schema/index";
-import { ALL_PERMISSIONS } from "@repo/validators";
-import { eq } from "drizzle-orm";
 
 const url = process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL is not set");
@@ -110,6 +112,24 @@ async function seed() {
     }
     console.log(`  Synced ${permissions.length} permissions for role: ${roleId}`);
   }
+
+  const allUserRoles = await db.query.userRoles.findMany();
+  const usersByRole = new Map<string, Set<string>>();
+  for (const ur of allUserRoles) {
+    if (!usersByRole.has(ur.userId)) usersByRole.set(ur.userId, new Set());
+    usersByRole.get(ur.userId)?.add(ur.roleId);
+  }
+
+  let syncedCount = 0;
+  for (const [userId, roleIds] of usersByRole) {
+    const roleString = [...roleIds].join(",") || "member";
+    await db
+      .update(schema.users)
+      .set({ role: roleString, updatedAt: new Date() })
+      .where(eq(schema.users.id, userId));
+    syncedCount++;
+  }
+  console.log(`  Synced role field for ${syncedCount} user(s)`);
 
   console.log("Done.");
   await client.end();

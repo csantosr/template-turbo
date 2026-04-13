@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { trpc } from "@/trpc/client";
 import { BanUserDialog } from "./_components/ban-user-dialog";
+import { ImpersonateUserDialog } from "./_components/impersonate-user-dialog";
 import { InviteUserDialog } from "./_components/invite-user-dialog";
 import { RemoveUserDialog } from "./_components/remove-user-dialog";
 import { ResendVerificationDialog } from "./_components/resend-verification-dialog";
@@ -43,6 +44,9 @@ export default function UsersPage() {
   const [showDeleted, setShowDeleted] = useState(false);
   const [deletedPage, setDeletedPage] = useState(1);
 
+  const { data: me } = trpc.user.me.useQuery();
+  const currentUserId = me?.id;
+
   const { data: myPerms } = trpc.rbac.myPermissions.useQuery();
   const permSet = new Set(myPerms ?? []);
   const canInvite = permSet.has("users:create");
@@ -52,6 +56,7 @@ export default function UsersPage() {
   const canBan = permSet.has("users:ban");
   const canReadDeletions = permSet.has("userDeletions:read");
   const canRestore = permSet.has("userDeletions:restore");
+  const canImpersonate = permSet.has("users:impersonate");
 
   useEffect(() => {
     const t = setTimeout(() => {
@@ -165,38 +170,46 @@ export default function UsersPage() {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-4">
-                    {canUpdate && !user.emailVerified && (
+                    {user.id === currentUserId && <Badge variant="muted">myself</Badge>}
+                    {canImpersonate && user.id !== currentUserId && (
+                      <ImpersonateUserDialog
+                        userId={user.id}
+                        userName={user.name}
+                        userEmail={user.email}
+                      />
+                    )}
+                    {canUpdate && !user.emailVerified && user.id !== currentUserId && (
                       <ResendVerificationDialog
                         userId={user.id}
                         userName={user.name}
                         userEmail={user.email}
                       />
                     )}
-                    {canUpdate && (
+                    {canUpdate && user.id !== currentUserId && (
                       <ResetPasswordDialog
                         userId={user.id}
                         userName={user.name}
                         userEmail={user.email}
                       />
                     )}
-                    {canManageRoles && (
+                    {canManageRoles && user.id !== currentUserId && (
                       <UserRbacDialog
                         userId={user.id}
                         userName={user.name}
                         userEmail={user.email}
                       />
                     )}
-                    {canBan && !user.banned && (
+                    {canBan && !user.banned && user.id !== currentUserId && (
                       <BanUserDialog userId={user.id} userName={user.name} userEmail={user.email} />
                     )}
-                    {canBan && user.banned && (
+                    {canBan && user.banned && user.id !== currentUserId && (
                       <UnbanUserDialog
                         userId={user.id}
                         userName={user.name}
                         userEmail={user.email}
                       />
                     )}
-                    {canDelete && (
+                    {canDelete && user.id !== currentUserId && (
                       <RemoveUserDialog
                         userId={user.id}
                         userName={user.name}
