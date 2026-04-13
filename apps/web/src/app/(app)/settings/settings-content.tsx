@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRight } from "@phosphor-icons/react";
+import { ArrowRightIcon } from "@phosphor-icons/react";
 import { ConfirmDialog, toast } from "@repo/ui";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { authClient } from "@/lib/auth-client";
@@ -111,10 +111,10 @@ export function SettingsContent() {
               trigger={
                 <button
                   type="button"
-                  className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
+                  className="cursor-pointer font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
                 >
                   <span className="flex items-center gap-1">
-                    Revoke all <ArrowRight weight="bold" size={14} />
+                    Revoke all <ArrowRightIcon weight="bold" size={14} />
                   </span>
                 </button>
               }
@@ -165,10 +165,10 @@ export function SettingsContent() {
             </div>
             <button
               type="button"
-              className="font-mono text-sm uppercase tracking-widest text-destructive hover:underline"
+              className="cursor-pointer font-mono text-sm uppercase tracking-widest text-destructive hover:underline"
             >
               <span className="flex items-center gap-1">
-                Delete <ArrowRight weight="bold" size={14} />
+                Delete <ArrowRightIcon weight="bold" size={14} />
               </span>
             </button>
           </div>

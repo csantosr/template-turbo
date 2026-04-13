@@ -68,7 +68,7 @@ export function ChangePasswordDialog() {
       trigger={
         <button
           type="button"
-          className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
+          className="cursor-pointer font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground"
         >
           <span className="flex items-center gap-1">Change</span>
         </button>
