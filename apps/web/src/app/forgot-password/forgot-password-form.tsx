@@ -1,11 +1,13 @@
 "use client";
 
-import { Button, Form, FormField, toast } from "@repo/ui";
+import { Button, Form, FormField } from "@repo/ui";
 import { forgotPasswordSchema } from "@repo/validators";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { requestPasswordReset } from "@/lib/auth-client";
 
 export function ForgotPasswordForm() {
+  const router = useRouter();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -37,7 +39,7 @@ export function ForgotPasswordForm() {
       redirectTo: `${window.location.origin}/reset-password`,
     });
 
-    toast.success("Reset email sent");
+    router.push(`/check-inbox?email=${encodeURIComponent(data.email)}`);
   }
 
   return (
