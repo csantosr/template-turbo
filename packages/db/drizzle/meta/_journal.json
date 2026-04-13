@@ -50,6 +50,13 @@
       "when": 1776044124145,
       "tag": "0006_mature_runaways",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1776107541380,
+      "tag": "0007_next_genesis",
+      "breakpoints": true
     }
   ]
 }
