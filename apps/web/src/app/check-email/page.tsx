@@ -35,14 +35,13 @@ function CheckEmailContent() {
           </p>
           {email ? (
             <p className="mb-6 font-mono text-sm text-foreground">
-              We sent a verification link to{" "}
-              <span className="font-bold">{email}</span>. Click the link in that
-              email to activate your account.
+              We sent a verification link to <span className="font-bold">{email}</span>. Click the
+              link in that email to activate your account.
             </p>
           ) : (
             <p className="mb-6 font-mono text-sm text-foreground">
-              We sent a verification link to your email address. Click the link
-              to activate your account.
+              We sent a verification link to your email address. Click the link to activate your
+              account.
             </p>
           )}
           {resent ? (

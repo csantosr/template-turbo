@@ -13,10 +13,8 @@ const buttonVariants = cva(
       variant: {
         default:
           "border-2 border-primary bg-promary-foreground text-foreground font-bold transition-none hover:shadow-none disabled:translate-x-0 disabled:translate-y-0 disabled:shadow-none",
-        outline:
-          "border-2 border-border bg-transparent transition-none hover:bg-secondary",
-        ghost:
-          "bg-transparent text-muted-foreground transition-colors hover:text-foreground",
+        outline: "border-2 border-border bg-transparent transition-none hover:bg-secondary",
+        ghost: "bg-transparent text-muted-foreground transition-colors hover:text-foreground",
         destructive:
           "border-2 border-destructive bg-destructive text-destructive-foreground font-bold transition-none hover:opacity-80",
       },

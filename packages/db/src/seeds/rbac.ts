@@ -95,9 +95,7 @@ async function seed() {
 
   for (const [roleId, permissions] of Object.entries(ROLE_PERMISSIONS)) {
     // Delete existing and re-insert (handles removed permissions cleanly)
-    await db
-      .delete(schema.rolePermissions)
-      .where(eq(schema.rolePermissions.roleId, roleId));
+    await db.delete(schema.rolePermissions).where(eq(schema.rolePermissions.roleId, roleId));
 
     if (permissions.length > 0) {
       await db.insert(schema.rolePermissions).values(

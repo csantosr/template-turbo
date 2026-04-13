@@ -17,9 +17,7 @@ export function ThemeToggle() {
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
       className={`flex h-9 w-20 shrink-0 items-center justify-center border-2 border-current font-mono text-sm uppercase tracking-widest hover:bg-foreground hover:text-background${!mounted ? " pointer-events-none opacity-0" : ""}`}
     >
-      <span suppressHydrationWarning>
-        {resolvedTheme === "dark" ? "LIGHT" : "DARK"}
-      </span>
+      <span suppressHydrationWarning>{resolvedTheme === "dark" ? "LIGHT" : "DARK"}</span>
     </button>
   );
 }

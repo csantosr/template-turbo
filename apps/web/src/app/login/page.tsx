@@ -14,9 +14,7 @@ export default async function LoginPage() {
       </header>
       <div className="w-full max-w-sm">
         <div className="border-2 border-border p-8">
-          <h1 className="mb-1 font-mono font-bold text-2xl uppercase tracking-widest">
-            SIGN IN
-          </h1>
+          <h1 className="mb-1 font-mono font-bold text-2xl uppercase tracking-widest">SIGN IN</h1>
           <p className="mb-8 font-mono text-sm uppercase tracking-widest text-muted-foreground">
             Enter your credentials
           </p>

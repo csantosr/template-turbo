@@ -1,17 +1,9 @@
 import { cn } from "../lib/utils";
 
-export function Table({
-  children,
-  className,
-}: {
-  children: React.ReactNode;
-  className?: string;
-}) {
+export function Table({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
     <div className="w-full overflow-x-auto border border-border">
-      <table className={cn("w-full border-collapse", className)}>
-        {children}
-      </table>
+      <table className={cn("w-full border-collapse", className)}>{children}</table>
     </div>
   );
 }
@@ -31,11 +23,7 @@ export function TableRow({
   children: React.ReactNode;
   className?: string;
 }) {
-  return (
-    <tr className={cn("border-b border-border last:border-0", className)}>
-      {children}
-    </tr>
-  );
+  return <tr className={cn("border-b border-border last:border-0", className)}>{children}</tr>;
 }
 
 export function TableHead({
@@ -67,6 +55,8 @@ export function TableCell({
   colSpan?: number;
 }) {
   return (
-    <td colSpan={colSpan} className={cn("px-4 py-3 font-mono text-base", className)}>{children}</td>
+    <td colSpan={colSpan} className={cn("px-4 py-3 font-mono text-base", className)}>
+      {children}
+    </td>
   );
 }
