@@ -54,12 +54,15 @@ const ADMIN_PERMISSIONS = ALL_PERMISSIONS.filter(
     resource === "settings" ||
     // admins can read roles and assign them but not create/delete
     (resource === "roles" && (action === "read" || action === "assign")) ||
-    resource === "activity",
+    resource === "activity" ||
+    // admins can fully manage kanban
+    resource === "kanban",
 );
 
-/** Permissions granted to the member role by default — settings only */
+/** Permissions granted to the member role by default — settings and kanban read */
 const MEMBER_PERMISSIONS = ALL_PERMISSIONS.filter(
-  ({ resource, action }) => resource === "settings" && action === "read",
+  ({ resource, action }) =>
+    (resource === "settings" && action === "read") || (resource === "kanban" && action === "read"),
 );
 
 const ROLE_PERMISSIONS: Record<string, { resource: string; action: string }[]> = {

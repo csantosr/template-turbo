@@ -1,6 +1,7 @@
 export * from "./accounts";
 export * from "./activity-logs";
 export * from "./chat";
+export * from "./kanban";
 export * from "./role-permissions";
 export * from "./roles";
 export * from "./sessions";

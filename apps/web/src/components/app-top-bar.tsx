@@ -3,6 +3,14 @@
 import { usePathname } from "next/navigation";
 import { trpc } from "@/trpc/client";
 
+const TITLES: Record<string, string> = {
+  "/dashboard": "DASHBOARD",
+  "/kanban": "KANBAN",
+  "/users": "USERS",
+  "/activity": "ACTIVITY",
+  "/settings": "SETTINGS",
+};
+
 export function AppTopBar() {
   const pathname = usePathname();
 

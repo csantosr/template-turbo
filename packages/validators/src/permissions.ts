@@ -4,6 +4,7 @@ export const PERMISSIONS = {
   settings: ["read", "update"],
   activity: ["read"],
   userDeletions: ["read", "restore"],
+  kanban: ["read", "create", "update", "delete"],
 } as const;
 
 export type Resource = keyof typeof PERMISSIONS;

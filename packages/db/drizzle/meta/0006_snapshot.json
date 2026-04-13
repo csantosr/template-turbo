@@ -1,5 +1,5 @@
 {
-  "id": "ad1fe215-0e74-4108-8e12-1ad7d9dd99ad",
+  "id": "53f6965a-66fa-4d70-9571-880b1ce6cc1a",
   "prevId": "27fcf5ae-f956-4f1b-8cbe-2a184668974e",
   "version": "7",
   "dialect": "postgresql",
@@ -182,8 +182,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.chat_threads": {
-      "name": "chat_threads",
+    "public.kanban_board": {
+      "name": "kanban_board",
       "schema": "",
       "columns": {
         "id": {
@@ -198,18 +198,12 @@
           "primaryKey": false,
           "notNull": true
         },
-        "title": {
-          "name": "title",
+        "name": {
+          "name": "name",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
-        },
-        "messages": {
-          "name": "messages",
-          "type": "jsonb",
-          "primaryKey": false,
           "notNull": true,
-          "default": "'[]'::jsonb"
+          "default": "'My Board'"
         },
         "created_at": {
           "name": "created_at",
@@ -228,12 +222,157 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "chat_threads_user_id_user_id_fk": {
-          "name": "chat_threads_user_id_user_id_fk",
-          "tableFrom": "chat_threads",
+        "kanban_board_user_id_user_id_fk": {
+          "name": "kanban_board_user_id_user_id_fk",
+          "tableFrom": "kanban_board",
           "tableTo": "user",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kanban_card": {
+      "name": "kanban_card",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "column_id": {
+          "name": "column_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "priority": {
+          "name": "priority",
+          "type": "priority",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "kanban_card_column_id_kanban_column_id_fk": {
+          "name": "kanban_card_column_id_kanban_column_id_fk",
+          "tableFrom": "kanban_card",
+          "tableTo": "kanban_column",
+          "columnsFrom": [
+            "column_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.kanban_column": {
+      "name": "kanban_column",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "board_id": {
+          "name": "board_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "position": {
+          "name": "position",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "kanban_column_board_id_kanban_board_id_fk": {
+          "name": "kanban_column_board_id_kanban_board_id_fk",
+          "tableFrom": "kanban_column",
+          "tableTo": "kanban_board",
+          "columnsFrom": [
+            "board_id"
           ],
           "columnsTo": [
             "id"
@@ -808,7 +947,17 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.priority": {
+      "name": "priority",
+      "schema": "public",
+      "values": [
+        "low",
+        "medium",
+        "high"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

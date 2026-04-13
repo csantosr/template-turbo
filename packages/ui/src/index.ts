@@ -32,7 +32,14 @@ export {
   FormError,
   FormField,
 } from "./components/form";
+export { Drawer } from "./components/drawer";
 export { Input, type InputProps } from "./components/input";
+export {
+  KanbanBoard,
+  type KanbanBoardProps,
+  type KanbanCard,
+  type KanbanColumn,
+} from "./components/kanban";
 export {
   Table,
   TableBody,

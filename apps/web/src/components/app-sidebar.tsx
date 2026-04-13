@@ -7,6 +7,7 @@ import {
   ChatsCircle,
   Gear,
   Plus,
+  Kanban,
   Pulse,
   ShieldCheck,
   SignOut,
@@ -34,6 +35,7 @@ const NAV: {
 }[] = [
   { href: "/dashboard", label: "DASHBOARD", icon: SquaresFour, permission: null },
   { href: "/chat", label: "AI CHAT", icon: ChatsCircle, permission: null },
+  { href: "/kanban", label: "KANBAN", icon: Kanban, permission: "kanban:read" },
   { href: "/users", label: "USERS", icon: Users, permission: "users:read" },
   { href: "/roles", label: "ROLES", icon: ShieldCheck, permission: "roles:read" },
   { href: "/activity", label: "ACTIVITY", icon: Pulse, permission: "activity:read" },
