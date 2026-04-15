@@ -47,6 +47,7 @@ export {
   DialogTitle,
   DialogTrigger,
 } from "./components/dialog";
+export { Drawer } from "./components/drawer";
 export {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -67,6 +68,12 @@ export {
 export { Form, FormError, FormField } from "./components/form";
 export { HoverCard, HoverCardContent, HoverCardTrigger } from "./components/hover-card";
 export { Input, type InputProps } from "./components/input";
+export {
+  KanbanBoard,
+  type KanbanBoardProps,
+  type KanbanCard,
+  type KanbanColumn,
+} from "./components/kanban";
 export { Pagination } from "./components/pagination";
 export { Popover, PopoverContent, PopoverTrigger } from "./components/popover";
 export { Progress } from "./components/progress";
@@ -99,14 +106,7 @@ export {
 export { Skeleton } from "./components/skeleton";
 export { Slider } from "./components/slider";
 export { Switch } from "./components/switch";
-export {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "./components/table";
+export { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./components/table";
 export { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/tabs";
 export { toast } from "./components/toast";
 export { Toaster } from "./components/toaster";

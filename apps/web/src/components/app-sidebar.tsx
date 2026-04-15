@@ -7,8 +7,8 @@ import {
   ChatsCircle,
   Cube,
   Gear,
-  Plus,
   Kanban,
+  Plus,
   Pulse,
   ShieldCheck,
   SignOut,
@@ -142,7 +142,7 @@ export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }:
         </button>
         {threadData.length > 0 &&
           threadData.map((thread) => (
-            <div
+            <li
               key={thread.id}
               className="group relative flex items-center justify-between border-l-2 border-transparent hover:border-muted-foreground"
               onMouseEnter={() => setHoveredThread(thread.id)}
@@ -175,7 +175,7 @@ export function AppSidebar({ userName, userEmail, permissions, impersonatedBy }:
                   <Trash size={12} weight="bold" />
                 </button>
               )}
-            </div>
+            </li>
           ))}
       </div>
     );

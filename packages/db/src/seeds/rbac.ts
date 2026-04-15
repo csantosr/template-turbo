@@ -28,21 +28,24 @@ if (!url) throw new Error("DATABASE_URL is not set");
 const client = postgres(url);
 const db = drizzle(client, { schema });
 
-const SYSTEM_ROLES: { id: string; name: string; description: string }[] = [
+const SYSTEM_ROLES: { id: string; name: string; description: string; isDefault: boolean }[] = [
   {
     id: "superadmin",
     name: "Super Admin",
     description: "Full access to everything. Permissions managed automatically.",
+    isDefault: false,
   },
   {
     id: "admin",
     name: "Admin",
     description: "Manages users and settings.",
+    isDefault: false,
   },
   {
     id: "member",
     name: "Member",
     description: "Standard member with read-only access.",
+    isDefault: true,
   },
 ];
 
@@ -82,7 +85,12 @@ async function seed() {
     if (existing) {
       await db
         .update(schema.roles)
-        .set({ name: role.name, description: role.description, updatedAt: new Date() })
+        .set({
+          name: role.name,
+          description: role.description,
+          isDefault: role.isDefault,
+          updatedAt: new Date(),
+        })
         .where(eq(schema.roles.id, role.id));
       console.log(`  Updated role: ${role.id}`);
     } else {
@@ -91,6 +99,7 @@ async function seed() {
         name: role.name,
         description: role.description,
         isSystem: true,
+        isDefault: role.isDefault,
         createdAt: new Date(),
         updatedAt: new Date(),
       });

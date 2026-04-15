@@ -123,17 +123,15 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <ActionDialog {...actionDialogProps}>
-      <>
-        {children}
-        <ConfirmFooter
-          onConfirm={onConfirm}
-          confirmLabel={confirmLabel}
-          confirmPendingLabel={confirmPendingLabel}
-          isPending={isPending}
-          variant={variant}
-          cancelLabel={cancelLabel}
-        />
-      </>
+      {children}
+      <ConfirmFooter
+        onConfirm={onConfirm}
+        confirmLabel={confirmLabel}
+        confirmPendingLabel={confirmPendingLabel}
+        isPending={isPending}
+        variant={variant}
+        cancelLabel={cancelLabel}
+      />
     </ActionDialog>
   );
 }

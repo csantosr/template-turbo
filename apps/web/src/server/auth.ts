@@ -1,5 +1,5 @@
 import * as schema from "@repo/db";
-import { activityLogs, db, users, verifications } from "@repo/db";
+import { activityLogs, db, roles, userRoles, users, verifications } from "@repo/db";
 import { ResetPasswordEmail, sendEmail, VerifyEmailEmail, WelcomeEmail } from "@repo/email";
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
@@ -10,6 +10,25 @@ import { eq } from "drizzle-orm";
 import { createElement } from "react";
 import { env } from "../../env";
 import { ac, adminRole, superAdminRole } from "./auth-access";
+
+async function assignDefaultRole(userId: string) {
+  const defaultRole = await db.query.roles.findFirst({
+    where: eq(schema.roles.isDefault, true),
+  });
+
+  if (defaultRole) {
+    await db.insert(schema.userRoles).values({
+      id: crypto.randomUUID(),
+      userId,
+      roleId: defaultRole.id,
+    });
+  }
+
+  await db
+    .update(schema.users)
+    .set({ role: defaultRole?.id ?? "member" })
+    .where(eq(schema.users.id, userId));
+}
 
 export const auth = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
@@ -44,6 +63,11 @@ export const auth = betterAuth({
       ...additionalFields,
       id,
     }),
+    after: {
+      createUser: async ({ user }: { user: { id: string } }) => {
+        await assignDefaultRole(user.id);
+      },
+    },
   },
   emailVerification: {
     sendOnSignUp: true,
@@ -72,6 +96,13 @@ export const auth = betterAuth({
     },
   },
   databaseHooks: {
+    user: {
+      create: {
+        after: async (user) => {
+          await assignDefaultRole(user.id);
+        },
+      },
+    },
     session: {
       create: {
         before: async (session, _ctx) => {

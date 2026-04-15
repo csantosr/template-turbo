@@ -57,6 +57,7 @@ function DialogContent({
         <DialogClose
           style={{ position: "absolute", top: "1rem", right: "1rem" }}
           className="text-muted-foreground hover:text-foreground focus:outline-none"
+          aria-label="Close dialog"
         >
           <svg
             width="18"
@@ -66,6 +67,7 @@ function DialogContent({
             stroke="currentColor"
             strokeWidth="2.5"
             strokeLinecap="round"
+            aria-hidden="true"
           >
             <line x1="3" y1="3" x2="15" y2="15" />
             <line x1="15" y1="3" x2="3" y2="15" />
@@ -128,13 +130,13 @@ function DialogFooter({ className, ...props }: ComponentProps<"div">) {
 
 export {
   Dialog,
-  DialogTrigger,
   DialogClose,
-  DialogPortal,
-  DialogOverlay,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
 };

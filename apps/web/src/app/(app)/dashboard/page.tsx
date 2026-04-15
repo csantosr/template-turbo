@@ -192,9 +192,9 @@ export default async function DashboardPage() {
             </Link>
           </div>
           <div className="border border-border">
-            {RECENT_ACTIVITY.map((a, i) => (
+            {RECENT_ACTIVITY.map((a) => (
               <div
-                key={i}
+                key={`${a.user}-${a.action}-${a.time}`}
                 className="flex items-start gap-3 border-b border-border p-4 last:border-0"
               >
                 <span

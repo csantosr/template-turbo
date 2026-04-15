@@ -93,6 +93,7 @@ export default function ActivityPage() {
         {totalPages > 1 && (
           <div className="flex items-center gap-3">
             <button
+              type="button"
               onClick={() => setPage((p) => Math.max(1, p - 1))}
               disabled={page === 1}
               className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
@@ -103,6 +104,7 @@ export default function ActivityPage() {
               {page} / {totalPages}
             </span>
             <button
+              type="button"
               onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
               className="font-mono text-sm uppercase tracking-widest text-muted-foreground hover:text-foreground disabled:pointer-events-none disabled:opacity-30"

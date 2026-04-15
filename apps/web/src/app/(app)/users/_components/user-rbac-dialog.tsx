@@ -107,6 +107,7 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
                   >
                     {ur.role?.name ?? ur.roleId}
                     <button
+                      type="button"
                       onClick={() => revokeRole.mutate({ userId, roleId: ur.roleId })}
                       disabled={revokeRole.isPending}
                       className="ml-1 text-muted-foreground hover:text-destructive"
@@ -170,6 +171,7 @@ export function UserRbacDialog({ userId, userName, userEmail }: Props) {
                         {o.granted ? "GRANTED" : "DENIED"}
                       </Badge>
                       <button
+                        type="button"
                         onClick={() =>
                           removePermission.mutate({
                             userId,

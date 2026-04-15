@@ -5,6 +5,7 @@ export const roles = pgTable("role", {
   name: text("name").notNull(),
   description: text("description"),
   isSystem: boolean("is_system").notNull().default(false),
+  isDefault: boolean("is_default").notNull().default(false),
   createdAt: timestamp("created_at", { mode: "date" }).notNull().defaultNow(),
   updatedAt: timestamp("updated_at", { mode: "date" }).notNull().defaultNow(),
 });

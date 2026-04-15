@@ -182,7 +182,11 @@ export const userRouter = router({
         });
       }
 
-      await ctx.db.update(users).set({ emailVerified: true }).where(eq(users.email, email));
+      // Explicitly set role to member for new users
+      await ctx.db
+        .update(users)
+        .set({ role: "member", emailVerified: true })
+        .where(eq(users.email, email));
 
       await ctx.db.delete(verifications).where(eq(verifications.id, verification.id));
 

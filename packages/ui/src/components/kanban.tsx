@@ -50,10 +50,9 @@ interface KanbanCardItemProps {
   card: KanbanCard;
   onDelete?: (id: string) => void;
   onCardClick?: (card: KanbanCard) => void;
-  isDragging?: boolean;
 }
 
-function KanbanCardItem({ card, onDelete, onCardClick, isDragging }: KanbanCardItemProps) {
+function KanbanCardItem({ card, onDelete, onCardClick }: KanbanCardItemProps) {
   const { isDragging: isBoardDragging } = useContext(KanbanDragContext);
 
   const {
@@ -95,8 +94,8 @@ function KanbanCardItem({ card, onDelete, onCardClick, isDragging }: KanbanCardI
         "group relative flex w-full flex-col gap-2 border-2 border-border bg-background p-4 text-left transition-shadow select-none",
         "shadow-[4px_4px_0_0_hsl(var(--foreground))]",
         "cursor-grab active:cursor-grabbing",
-        (isSortableDragging || isDragging) && "opacity-50",
-        !isSortableDragging && !isDragging && "hover:shadow-none",
+        (isSortableDragging || isBoardDragging) && "opacity-50",
+        !isSortableDragging && !isBoardDragging && "hover:shadow-none",
       )}
     >
       <div className="flex items-center justify-between gap-2">

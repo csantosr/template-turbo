@@ -136,6 +136,32 @@ export const rbacRouter = router({
       return { success: true };
     }),
 
+  setDefaultRole: requirePermission("roles", "update")
+    .input(z.object({ roleId: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const role = await ctx.db.query.roles.findFirst({
+        where: eq(roles.id, input.roleId),
+      });
+      if (!role) {
+        throw new TRPCError({ code: "NOT_FOUND", message: "Role not found." });
+      }
+
+      await ctx.db.update(roles).set({ isDefault: false }).where(eq(roles.isDefault, true));
+
+      await ctx.db.update(roles).set({ isDefault: true }).where(eq(roles.id, input.roleId));
+
+      await ctx.db.insert(activityLogs).values({
+        id: crypto.randomUUID(),
+        userId: ctx.session.user.id,
+        userEmail: ctx.session.user.email,
+        action: "ROLE_SET_DEFAULT",
+        detail: `Set default role to "${input.roleId}"`,
+        status: "success",
+      });
+
+      return { success: true };
+    }),
+
   deleteRole: requirePermission("roles", "delete")
     .input(z.object({ roleId: z.string() }))
     .mutation(async ({ ctx, input }) => {

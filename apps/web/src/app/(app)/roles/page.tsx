@@ -1,10 +1,12 @@
 "use client";
 
+import { Star } from "@phosphor-icons/react";
 import { Badge, Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@repo/ui";
 import { trpc } from "@/trpc/client";
 import { CreateRoleDialog } from "./_components/create-role-dialog";
 import { DeleteRoleDialog } from "./_components/delete-role-dialog";
 import { EditPermissionsDialog } from "./_components/edit-permissions-dialog";
+import { SetDefaultRoleDialog } from "./_components/set-default-role-dialog";
 
 export default function RolesPage() {
   const { data: roles, isLoading } = trpc.rbac.listRoles.useQuery();
@@ -36,6 +38,7 @@ export default function RolesPage() {
             <TableHead>Name</TableHead>
             <TableHead>Description</TableHead>
             <TableHead>Type</TableHead>
+            <TableHead>Default</TableHead>
             <TableHead>Permissions</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
@@ -43,13 +46,13 @@ export default function RolesPage() {
         <TableBody>
           {isLoading ? (
             <TableRow>
-              <TableCell className="py-12 text-center text-muted-foreground" colSpan={6}>
+              <TableCell className="py-12 text-center text-muted-foreground" colSpan={7}>
                 Loading...
               </TableCell>
             </TableRow>
           ) : !roles || roles.length === 0 ? (
             <TableRow>
-              <TableCell className="py-12 text-center text-muted-foreground" colSpan={6}>
+              <TableCell className="py-12 text-center text-muted-foreground" colSpan={7}>
                 No roles found. Run <code className="font-mono">pnpm db:seed:rbac</code> to seed
                 defaults.
               </TableCell>
@@ -74,12 +77,22 @@ export default function RolesPage() {
                   )}
                 </TableCell>
                 <TableCell>
+                  {role.isDefault ? (
+                    <Star weight="fill" size={20} className="text-yellow-500" />
+                  ) : (
+                    <span className="text-muted-foreground">—</span>
+                  )}
+                </TableCell>
+                <TableCell>
                   <span className="font-mono text-sm text-muted-foreground">
                     {role.permissions.length} permission{role.permissions.length !== 1 ? "s" : ""}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
+                    {canUpdate && !role.isDefault && (
+                      <SetDefaultRoleDialog roleId={role.id} roleName={role.name} />
+                    )}
                     {canUpdate && (
                       <EditPermissionsDialog
                         role={{

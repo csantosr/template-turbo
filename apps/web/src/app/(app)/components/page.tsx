@@ -151,7 +151,11 @@ export default function ComponentsPage() {
 
           <ExampleCard title="Checkbox">
             <div className="flex items-center gap-2">
-              <Checkbox id="terms" checked={checked} onCheckedChange={setChecked} />
+              <Checkbox
+                id="terms"
+                checked={checked}
+                onCheckedChange={(checked) => setChecked(Boolean(checked))}
+              />
               <label htmlFor="terms" className="font-mono text-sm cursor-pointer">
                 Accept terms
               </label>
@@ -324,7 +328,7 @@ export default function ComponentsPage() {
                 <p className="font-mono text-sm">Card content goes here.</p>
               </CardContent>
               <CardFooter>
-                <Button size="sm">Action</Button>
+                <Button size="md">Action</Button>
               </CardFooter>
             </Card>
           </ExampleCard>

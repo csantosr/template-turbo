@@ -13,7 +13,8 @@ export function TypingTitle({ title, fallback, className = "" }: TypingTitleProp
   const [isTyping, setIsTyping] = useState(false);
   const prevTitleRef = useRef<string | null>(null);
 
-  useEffect(() => {
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const updateDisplayedText = () => {
     if (!title) {
       setDisplayedText(fallback);
       setIsTyping(false);
@@ -48,7 +49,10 @@ export function TypingTitle({ title, fallback, className = "" }: TypingTitleProp
     }
 
     prevTitleRef.current = title;
-  }, [title, fallback]);
+  };
+
+  // biome-disable-next-line react-hooks/exhaustive-deps
+  useEffect(updateDisplayedText, [title, fallback]);
 
   useEffect(() => {
     if (title !== null) {
