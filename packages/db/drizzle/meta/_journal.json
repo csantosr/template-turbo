@@ -5,57 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1775767775565,
-      "tag": "0000_loose_madame_hydra",
+      "when": 1776206941909,
+      "tag": "0000_late_rocket_racer",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1775768109135,
-      "tag": "0001_plain_excalibur",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1775854463371,
-      "tag": "0002_narrow_ultimatum",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1775918181411,
-      "tag": "0003_last_ulik",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1775923948977,
-      "tag": "0004_supreme_titanium_man",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1776035684460,
-      "tag": "0005_milky_lady_vermin",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1776044124145,
-      "tag": "0006_mature_runaways",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1776107541380,
-      "tag": "0007_next_genesis",
+      "when": 1776207583304,
+      "tag": "0001_woozy_argent",
       "breakpoints": true
     }
   ]
