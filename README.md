@@ -4,22 +4,22 @@ A monorepo template for bootstrapping web projects with a standardized full-stac
 
 ## Stack
 
-| Area | Technology |
-|------|-----------|
-| Monorepo | Turborepo + pnpm workspaces |
-| Web Framework | Next.js 16 (App Router, React 19) |
-| API | tRPC v11 + TanStack Query v5 |
-| Auth | Better Auth (email+password, admin plugin, RBAC) |
-| Database | PostgreSQL 16 |
-| ORM | Drizzle ORM (postgres.js driver) |
-| Validation | Zod v4 |
-| Email | React Email + Resend (prod) / Nodemailer + Mailpit (dev) |
-| UI | Radix UI + CVA + shadcn/ui pattern, Tailwind CSS v4 |
-| Markdown | react-markdown + remark-gfm |
-| Styling | Brutalist theme (no border-radius, monospace, heavy borders, dark mode) |
-| Lint/Format | Biome v2 |
-| Icons | Phosphor Icons |
-| Env | @t3-oss/env-nextjs |
+| Area          | Technology                                                              |
+| ------------- | ----------------------------------------------------------------------- |
+| Monorepo      | Turborepo + pnpm workspaces                                             |
+| Web Framework | Next.js 16 (App Router, React 19)                                       |
+| API           | tRPC v11 + TanStack Query v5                                            |
+| Auth          | Better Auth (email+password, admin plugin, RBAC)                        |
+| Database      | PostgreSQL 16                                                           |
+| ORM           | Drizzle ORM (postgres.js driver)                                        |
+| Validation    | Zod v4                                                                  |
+| Email         | React Email + Resend (prod) / Nodemailer + Mailpit (dev)                |
+| UI            | Radix UI + CVA + shadcn/ui pattern, Tailwind CSS v4                     |
+| Markdown      | react-markdown + remark-gfm                                             |
+| Styling       | Brutalist theme (no border-radius, monospace, heavy borders, dark mode) |
+| Lint/Format   | Biome v2                                                                |
+| Icons         | Phosphor Icons                                                          |
+| Env           | @t3-oss/env-nextjs                                                      |
 
 ## Getting Started
 
@@ -94,15 +94,15 @@ packages/
 
 ## Commands
 
-| Command | Description |
-|---------|-------------|
-| `pnpm dev` | Start Docker services + dev server |
-| `pnpm build` | Build all apps and packages |
-| `pnpm lint` | Lint all packages with Biome |
-| `pnpm format` | Format all files with Biome |
-| `pnpm db:generate` | Generate Drizzle migrations |
-| `pnpm db:migrate` | Run database migrations |
-| `pnpm db:studio` | Open Drizzle Studio |
+| Command            | Description                        |
+| ------------------ | ---------------------------------- |
+| `pnpm dev`         | Start Docker services + dev server |
+| `pnpm build`       | Build all apps and packages        |
+| `pnpm lint`        | Lint all packages with Biome       |
+| `pnpm format`      | Format all files with Biome        |
+| `pnpm db:generate` | Generate Drizzle migrations        |
+| `pnpm db:migrate`  | Run database migrations            |
+| `pnpm db:studio`   | Open Drizzle Studio                |
 
 Run commands for a specific package using filters:
 
@@ -138,4 +138,5 @@ When using this template for a new project:
 
 ## License
 
-Private — all rights reserved.
+MIT
+
