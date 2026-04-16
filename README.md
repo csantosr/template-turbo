@@ -9,7 +9,7 @@ A monorepo template for bootstrapping web projects with a standardized full-stac
 | Monorepo      | Turborepo + pnpm workspaces                                             |
 | Web Framework | Next.js 16 (App Router, React 19)                                       |
 | API           | tRPC v11 + TanStack Query v5                                            |
-| Auth          | Better Auth (email+password, admin plugin, RBAC)                        |
+| Auth          | Better Auth (email+password, Google, admin plugin, RBAC)               |
 | Database      | PostgreSQL 16                                                           |
 | ORM           | Drizzle ORM (postgres.js driver)                                        |
 | Validation    | Zod v4                                                                  |
